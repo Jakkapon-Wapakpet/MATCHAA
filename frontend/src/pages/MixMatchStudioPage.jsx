@@ -320,7 +320,7 @@ export default function MixMatchStudioPage() {
               </div>
               <div className="w-full h-2 rounded-full bg-white border border-[#D9D3C7] overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-[#8F9779] to-[#2D5A27] transition-all duration-500" 
+                  className="h-full bg-linear-to-r from-[#8F9779] to-[#2D5A27] transition-all duration-500" 
                   style={{ width: `${harmonyScore}%` }}
                 />
               </div>
