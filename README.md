@@ -29,7 +29,49 @@
 
 ---
 
-## 🏗️ Architecture & Directory Structure
+## 🏗️ Final System Architecture
+
+```mermaid
+graph TB
+    subgraph Client ["🖥️ PRESENTATION TIER (Frontend — React 18 SPA)"]
+        UI["React 18 + Tailwind CSS<br/>(Vite 5 Runtime)"]
+        CTX["State & Context Providers<br/>AuthContext · CartContext · ToastContext"]
+        ENGINE["Color Harmony Engine<br/>(fashionTheory.js)"]
+        SVC["API Service Client Layer<br/>(services/api.js)"]
+        UI --> CTX
+        UI --> ENGINE
+        CTX --> SVC
+    end
+
+    subgraph Server ["⚙️ APPLICATION TIER (Backend API Gateway)"]
+        MW["Express Middleware Pipeline<br/>JWT Verification · Role Guards · CORS"]
+        ROUTES["RESTful CRUD Route Handlers<br/>/api/products · /api/cart · /api/orders · /api/users · /api/auth"]
+        VALID["Mongoose Schema Validators<br/>(Price > 0, Name >= 3, bcrypt hooks)"]
+        FALLBACK["Graceful Local Dataset Fallback<br/>(data/products.js)"]
+        
+        MW --> ROUTES
+        ROUTES --> VALID
+        ROUTES -.Offline Graceful Fallback.-> FALLBACK
+    end
+
+    subgraph Data ["🗄️ DATA TIER (Cloud Database)"]
+        ODM["Mongoose ODM Models<br/>Product · User · Cart · Order"]
+        DB[("☁️ MongoDB Atlas Cloud Cluster<br/>Collections: products, users, carts, orders")]
+        
+        VALID --> ODM
+        ODM --> DB
+    end
+
+    SVC -- "HTTPS / JSON REST API" --> MW
+
+    subgraph Suite ["🧪 AUDIT & AUTOMATED VERIFICATION"]
+        E2E["test_full_system.js<br/>30/30 Automated E2E Checks"]
+        E2E -.Verifies.-> ROUTES
+        E2E -.Verifies.-> DB
+    end
+```
+
+### Directory Structure
 
 ```text
 MatchA/
