@@ -42,6 +42,7 @@ app.get('/api/health', (req, res) => {
 });
 
 
+const Product = require('./models/Product');
 const productsData = require('./data/products');
 
 // Sample Starter API endpoint
@@ -55,28 +56,55 @@ app.get('/api/items', (req, res) => {
   });
 });
 
-// Categories list with counts
-app.get('/api/categories', (req, res) => {
+// Categories list with counts (Aggregated dynamically from MongoDB with fallback)
+app.get('/api/categories', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      const counts = await Product.aggregate([
+        { $group: { _id: '$category', count: { $sum: 1 } } }
+      ]);
+      const categoryCounts = counts.reduce((acc, c) => {
+        if (c._id) acc[c._id] = c.count;
+        return acc;
+      }, {});
+      const totalAll = await Product.countDocuments();
+      return res.json({
+        success: true,
+        data: [
+          { id: 'ALL', name: 'All Products', count: totalAll },
+          { id: 'Tops', name: 'Tops & Knitwear', count: categoryCounts['Tops'] || 0 },
+          { id: 'Bottoms', name: 'Bottoms & Denim', count: categoryCounts['Bottoms'] || 0 },
+          { id: 'Outerwear', name: 'Outerwear & Coats', count: categoryCounts['Outerwear'] || 0 },
+          { id: 'Accessories', name: 'Accessories & Bags', count: categoryCounts['Accessories'] || 0 }
+        ]
+      });
+    }
+  } catch (err) {
+    console.warn('DB categories query fallback:', err.message);
+  }
+
+  // Fallback to static data
   const categoryCounts = productsData.reduce((acc, p) => {
     acc[p.category] = (acc[p.category] || 0) + 1;
     return acc;
   }, {});
 
-  const categories = [
-    { id: 'ALL', name: 'All Products', count: productsData.length },
-    { id: 'Tops', name: 'Tops & Knitwear', count: categoryCounts['Tops'] || 0 },
-    { id: 'Bottoms', name: 'Bottoms & Denim', count: categoryCounts['Bottoms'] || 0 },
-    { id: 'Outerwear', name: 'Outerwear & Coats', count: categoryCounts['Outerwear'] || 0 },
-    { id: 'Accessories', name: 'Accessories & Bags', count: categoryCounts['Accessories'] || 0 }
-  ];
-
-  res.json({ success: true, data: categories });
+  res.json({
+    success: true,
+    data: [
+      { id: 'ALL', name: 'All Products', count: productsData.length },
+      { id: 'Tops', name: 'Tops & Knitwear', count: categoryCounts['Tops'] || 0 },
+      { id: 'Bottoms', name: 'Bottoms & Denim', count: categoryCounts['Bottoms'] || 0 },
+      { id: 'Outerwear', name: 'Outerwear & Coats', count: categoryCounts['Outerwear'] || 0 },
+      { id: 'Accessories', name: 'Accessories & Bags', count: categoryCounts['Accessories'] || 0 }
+    ]
+  });
 });
 
-// Full Catalog API with search, category, sort, price, inStock, and pagination
-app.get('/api/products', (req, res) => {
+// Full Catalog API with search, category, sort, price, inStock, and pagination (MongoDB)
+app.get('/api/products', async (req, res) => {
   try {
-    let {
+    const {
       category = 'ALL',
       season = 'ALL',
       search = '',
@@ -90,98 +118,334 @@ app.get('/api/products', (req, res) => {
       limit = 24
     } = req.query;
 
-    let filtered = [...productsData];
-
-    // 1. Category Filter
-    if (category && category !== 'ALL') {
-      filtered = filtered.filter(p => p.category.toLowerCase() === category.toLowerCase());
-    }
-
-    // 2. Season Filter
-    if (season && season !== 'ALL') {
-      filtered = filtered.filter(p => p.season && p.season.toLowerCase() === season.toLowerCase());
-    }
-
-    // 2. Search Query (Name, ID, Description, Color, Fit)
-    if (search && search.trim()) {
-      const q = search.trim().toLowerCase();
-      filtered = filtered.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        p.id.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q) ||
-        p.color.toLowerCase().includes(q) ||
-        (p.tag && p.tag.toLowerCase().includes(q))
-      );
-    }
-
-    // 3. Color Filter
-    if (color && color !== 'ALL') {
-      filtered = filtered.filter(p => p.color.toLowerCase().includes(color.toLowerCase()));
-    }
-
-    // 4. Fit Filter
-    if (fit && fit !== 'ALL') {
-      filtered = filtered.filter(p => p.fit && p.fit.toLowerCase().includes(fit.toLowerCase()));
-    }
-
-    // 5. In-Stock Only Filter
-    if (inStockOnly === 'true') {
-      filtered = filtered.filter(p => p.inStock);
-    }
-
-    // 6. Price Range Filter
-    const minP = parseFloat(minPrice) || 0;
-    const maxP = parseFloat(maxPrice) || 1000;
-    filtered = filtered.filter(p => p.price >= minP && p.price <= maxP);
-
-    // 7. Sorting
-    switch (sort) {
-      case 'price-asc':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'newest':
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        break;
-      case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'featured':
-      default:
-        filtered.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
-        break;
-    }
-
-    // 8. Pagination
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 12;
-    const totalItems = filtered.length;
-    const totalPages = Math.ceil(totalItems / limitNum);
-    const startIndex = (pageNum - 1) * limitNum;
-    const paginatedProducts = filtered.slice(startIndex, startIndex + limitNum);
+
+    if (mongoose.connection.readyState === 1) {
+      const query = {};
+
+      if (category && category !== 'ALL') {
+        query.category = { $regex: new RegExp(`^${category}$`, 'i') };
+      }
+      if (season && season !== 'ALL') {
+        query.season = { $regex: new RegExp(`^${season}$`, 'i') };
+      }
+      if (color && color !== 'ALL') {
+        query.color = { $regex: new RegExp(`^${color}$`, 'i') };
+      }
+      if (fit && fit !== 'ALL') {
+        query.fit = { $regex: new RegExp(`^${fit}$`, 'i') };
+      }
+      if (inStockOnly === 'true') {
+        query.inStock = true;
+      }
+
+      const minP = parseFloat(minPrice) || 0;
+      const maxP = parseFloat(maxPrice) || 10000;
+      query.price = { $gte: minP, $lte: maxP };
+
+      if (search && search.trim()) {
+        const qRegex = { $regex: search.trim(), $options: 'i' };
+        query.$or = [
+          { name: qRegex },
+          { id: qRegex },
+          { description: qRegex },
+          { color: qRegex },
+          { tag: qRegex }
+        ];
+      }
+
+      let sortOption = {};
+      switch (sort) {
+        case 'price-asc':
+          sortOption = { price: 1 };
+          break;
+        case 'price-desc':
+          sortOption = { price: -1 };
+          break;
+        case 'newest':
+          sortOption = { createdAt: -1 };
+          break;
+        case 'rating':
+          sortOption = { rating: -1 };
+          break;
+        case 'featured':
+        default:
+          sortOption = { isFeatured: -1, createdAt: -1 };
+          break;
+      }
+
+      const totalItems = await Product.countDocuments(query);
+      const totalPages = Math.ceil(totalItems / limitNum);
+      const paginatedProducts = await Product.find(query)
+        .sort(sortOption)
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum)
+        .lean();
+
+      const totalAll = await Product.countDocuments();
+      return res.json({
+        success: true,
+        data: paginatedProducts,
+        pagination: {
+          total: totalItems,
+          page: pageNum,
+          totalPages,
+          limit: limitNum,
+          hasNextPage: pageNum < totalPages,
+          hasPrevPage: pageNum > 1
+        },
+        availableFilters: {
+          totalAll,
+          priceMin: 0,
+          priceMax: 1000
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching products from DB:', error);
+  }
+
+  // Fallback to local memory filtering if DB is unavailable
+  let filtered = [...productsData];
+  const {
+    category = 'ALL',
+    season = 'ALL',
+    search = '',
+    sort = 'featured',
+    color = '',
+    fit = '',
+    inStockOnly = 'false',
+    minPrice = 0,
+    maxPrice = 1000,
+    page = 1,
+    limit = 24
+  } = req.query;
+
+  if (category && category !== 'ALL') {
+    filtered = filtered.filter(p => p.category.toLowerCase() === category.toLowerCase());
+  }
+  if (season && season !== 'ALL') {
+    filtered = filtered.filter(p => p.season && p.season.toLowerCase() === season.toLowerCase());
+  }
+  if (search && search.trim()) {
+    const q = search.trim().toLowerCase();
+    filtered = filtered.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.id.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q) ||
+      p.color.toLowerCase().includes(q) ||
+      (p.tag && p.tag.toLowerCase().includes(q))
+    );
+  }
+  if (color && color !== 'ALL') {
+    filtered = filtered.filter(p => p.color.toLowerCase().includes(color.toLowerCase()));
+  }
+  if (fit && fit !== 'ALL') {
+    filtered = filtered.filter(p => p.fit && p.fit.toLowerCase().includes(fit.toLowerCase()));
+  }
+  if (inStockOnly === 'true') {
+    filtered = filtered.filter(p => p.inStock);
+  }
+
+  const minP = parseFloat(minPrice) || 0;
+  const maxP = parseFloat(maxPrice) || 1000;
+  filtered = filtered.filter(p => p.price >= minP && p.price <= maxP);
+
+  switch (sort) {
+    case 'price-asc':
+      filtered.sort((a, b) => a.price - b.price);
+      break;
+    case 'price-desc':
+      filtered.sort((a, b) => b.price - a.price);
+      break;
+    case 'newest':
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      break;
+    case 'rating':
+      filtered.sort((a, b) => b.rating - a.rating);
+      break;
+    case 'featured':
+    default:
+      filtered.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
+      break;
+  }
+
+  const pageNum = parseInt(page, 10) || 1;
+  const limitNum = parseInt(limit, 10) || 12;
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / limitNum);
+  const startIndex = (pageNum - 1) * limitNum;
+  const paginatedProducts = filtered.slice(startIndex, startIndex + limitNum);
+
+  res.json({
+    success: true,
+    data: paginatedProducts,
+    pagination: {
+      total: totalItems,
+      page: pageNum,
+      totalPages,
+      limit: limitNum,
+      hasNextPage: pageNum < totalPages,
+      hasPrevPage: pageNum > 1
+    },
+    availableFilters: {
+      totalAll: productsData.length,
+      priceMin: Math.min(...productsData.map(p => p.price)),
+      priceMax: Math.max(...productsData.map(p => p.price))
+    }
+  });
+});
+
+// Single Product Details (Task 8.1)
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (mongoose.connection.readyState === 1) {
+      let product = null;
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        product = await Product.findById(id);
+      }
+      if (!product) {
+        product = await Product.findOne({ id });
+      }
+      if (product) {
+        return res.json({ success: true, data: product });
+      }
+    }
+
+    const fallback = productsData.find(p => p.id === id || p._id === id);
+    if (fallback) {
+      return res.json({ success: true, data: fallback });
+    }
+
+    res.status(404).json({ success: false, message: 'Product not found' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error retrieving product', error: error.message });
+  }
+});
+
+// Create Product Endpoint (Task 8.2 & Task 10)
+app.post('/api/products', async (req, res) => {
+  try {
+    const {
+      name,
+      description,
+      price,
+      quantity,
+      stock,
+      date,
+      tag,
+      category,
+      subCategory,
+      image,
+      season,
+      color,
+      colorHex,
+      fit,
+      sizes,
+      variants,
+      id
+    } = req.body;
+
+    const finalQuantity = quantity !== undefined ? Number(quantity) : (stock !== undefined ? Number(stock) : 20);
+
+    const newProduct = new Product({
+      id: id || `SKU-${Date.now().toString().slice(-4)}`,
+      name,
+      description,
+      price: Number(price),
+      quantity: finalQuantity,
+      date: date || new Date().toISOString().split('T')[0],
+      tag: tag || 'New Drop',
+      category: category || 'Tops',
+      subCategory: subCategory || '',
+      image: image || '/images/products/autumn/tops/shirts/color_1_brown.jpeg',
+      season: season || 'All Season',
+      color: color || 'Matcha Green',
+      colorHex: colorHex || '#2D5A27',
+      fit: fit || 'Regular',
+      sizes: sizes && sizes.length ? sizes : ['S', 'M', 'L', 'XL'],
+      variants: variants || []
+    });
+
+    const saved = await newProduct.save();
+    res.status(201).json({
+      success: true,
+      message: 'Product created successfully in MongoDB',
+      data: saved
+    });
+  } catch (error) {
+    console.error('Error creating product:', error);
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json({ success: false, message: messages.join(', '), errors: error.errors });
+    }
+    res.status(500).json({ success: false, message: 'Failed to create product', error: error.message });
+  }
+});
+
+// Update Product / Stock Endpoint (Task 8.3)
+app.put('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = { ...req.body };
+
+    if (updateData.stock !== undefined && updateData.quantity === undefined) {
+      updateData.quantity = Number(updateData.stock);
+    }
+    if (updateData.quantity !== undefined) {
+      updateData.inStock = Number(updateData.quantity) > 0;
+    }
+
+    let updated = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      updated = await Product.findByIdAndUpdate(id, updateData, { returnDocument: 'after', runValidators: true });
+    }
+    if (!updated) {
+      updated = await Product.findOneAndUpdate({ id }, updateData, { returnDocument: 'after', runValidators: true });
+    }
+
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Product not found to update' });
+    }
 
     res.json({
       success: true,
-      data: paginatedProducts,
-      pagination: {
-        total: totalItems,
-        page: pageNum,
-        totalPages,
-        limit: limitNum,
-        hasNextPage: pageNum < totalPages,
-        hasPrevPage: pageNum > 1
-      },
-      availableFilters: {
-        totalAll: productsData.length,
-        priceMin: Math.min(...productsData.map(p => p.price)),
-        priceMax: Math.max(...productsData.map(p => p.price))
-      }
+      message: 'Product updated successfully in MongoDB',
+      data: updated
     });
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ success: false, message: 'Failed to retrieve products' });
+    console.error('Error updating product:', error);
+    res.status(500).json({ success: false, message: 'Failed to update product', error: error.message });
+  }
+});
+
+// Delete Product Endpoint (Task 8.4)
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let deleted = null;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      deleted = await Product.findByIdAndDelete(id);
+    }
+    if (!deleted) {
+      deleted = await Product.findOneAndDelete({ id });
+    }
+
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Product not found to delete' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Product deleted successfully from MongoDB',
+      data: deleted
+    });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete product', error: error.message });
   }
 });
 
