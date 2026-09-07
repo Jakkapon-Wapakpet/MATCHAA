@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Lenis from 'lenis';
 import { api } from './services/api';
 
@@ -6,60 +7,52 @@ import HomePage from './pages/HomePage';
 import CatalogPage from './pages/CatalogPage';
 import CartPage from './pages/CartPage';
 import SignUpPage from './pages/SignUpPage';
-import Layout from './components/Layout';
-import ProductModal from './components/ProductModal';
+import LoginPage from './pages/LoginPage';
+import PaymentPage from './pages/PaymentPage';
+import UserAccount from './pages/UserAccount';
+import AdminPage from './pages/AdminPage';
+import PersonalColorPage from './pages/PersonalColorPage';
+import MixMatchStudioPage from './pages/MixMatchStudioPage';
+import EditorialLookbookPage from './pages/EditorialLookbookPage';
+import Layout from './components/layout/Layout';
+import ProductModal from './components/product/ProductModal';
 
-const getCartKey = (item) => `${item.id}-${item.size || 'default'}-${item.color || 'default'}`;
+// Context Providers and Hooks
+import { ToastProvider, useToast, AuthProvider, useAuth, CartProvider, useCart } from './context';
 
-const loadCart = () => {
-  try {
-    const saved = localStorage.getItem('matcha_cart');
-    return saved ? JSON.parse(saved) : [];
-  } catch {
-    return [];
-  }
-};
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-export default function App() {
+  // Context Hooks
+  const { cartItems, setCartItems, addToCart, updateQty, removeItem, cartCount } = useCart();
+  const { currentUser, login, logout } = useAuth();
+  const { showToast } = useToast();
+
+  // Local UI States
   const [healthStatus, setHealthStatus] = useState(null);
-  const [cartItems, setCartItems] = useState(loadCart);
-  const [toast, setToast] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
-  // Page Routing State ('home' | 'catalog' | 'cart' | 'signup')
-  const [currentPage, setCurrentPage] = useState(() => {
-    const hash = window.location.hash.toLowerCase();
-    if (hash === '#catalog') return 'catalog';
-    if (hash === '#cart') return 'cart';
-    if (hash === '#signup') return 'signup';
-    return 'home';
-  });
   const [catalogCategory, setCatalogCategory] = useState('ALL');
 
-  // Sync cart to localStorage
+  // Support legacy hash redirection (#catalog -> /catalog, #cart -> /cart, #signup -> /signup, etc.)
   useEffect(() => {
-    try {
-      localStorage.setItem('matcha_cart', JSON.stringify(cartItems));
-    } catch (e) {
-      console.error('Failed to save cart to localStorage', e);
+    const hash = window.location.hash.toLowerCase();
+    if (hash === '#catalog' && location.pathname !== '/catalog') {
+      navigate('/catalog', { replace: true });
+    } else if (hash === '#cart' && location.pathname !== '/cart') {
+      navigate('/cart', { replace: true });
+    } else if (hash === '#signup' && location.pathname !== '/signup') {
+      navigate('/signup', { replace: true });
+    } else if (hash === '#login' && location.pathname !== '/login') {
+      navigate('/login', { replace: true });
+    } else if (hash === '#payment' && location.pathname !== '/payment') {
+      navigate('/payment', { replace: true });
+    } else if (hash === '#account' && location.pathname !== '/account') {
+      navigate('/account', { replace: true });
+    } else if (hash === '#admin' && location.pathname !== '/admin') {
+      navigate('/admin', { replace: true });
     }
-  }, [cartItems]);
-
-  // Sync hash routing
-  useEffect(() => {
-    const handleHash = () => {
-      const hash = window.location.hash.toLowerCase();
-      if (hash === '#catalog') setCurrentPage('catalog');
-      else if (hash === '#cart') setCurrentPage('cart');
-      else if (hash === '#signup') setCurrentPage('signup');
-      else if (hash === '' || hash === '#brand-hero' || hash.startsWith('#')) {
-        if (hash === '#catalog' || hash === '#cart' || hash === '#signup') return;
-        setCurrentPage('home');
-      }
-    };
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
-  }, []);
+  }, [location.pathname, navigate]);
 
   // Initialize Lenis Smooth Scroll
   useEffect(() => {
@@ -87,6 +80,7 @@ export default function App() {
     };
   }, []);
 
+  // Health check
   useEffect(() => {
     async function loadHealth() {
       try {
@@ -99,96 +93,76 @@ export default function App() {
     loadHealth();
   }, []);
 
-  const showToast = (message) => {
-    setToast(message);
-    setTimeout(() => setToast(null), 3500);
-  };
-
-  const handleAddToCart = (product) => {
-    const amount = product.quantity || 1;
-    setCartItems((prev) => {
-      const key = getCartKey(product);
-      const idx = prev.findIndex((item) => getCartKey(item) === key);
-      if (idx > -1) {
-        const next = [...prev];
-        next[idx] = { ...next[idx], quantity: (next[idx].quantity || 1) + amount };
-        return next;
-      }
-      return [...prev, { ...product, quantity: amount }];
-    });
-    const details = product.size && product.color ? ` (${product.size} / ${product.color})` : '';
-    showToast(`Added ${product.name}${details} to bag! 🛍️`);
-  };
-
-  const handleUpdateQty = (key, delta) => {
-    setCartItems((prev) =>
-      prev
-        .map((item) =>
-          getCartKey(item) === key
-            ? { ...item, quantity: (item.quantity || 1) + delta }
-            : item
-        )
-        .filter((item) => (item.quantity || 1) > 0)
-    );
-  };
-
-  const handleRemoveItem = (key) => {
-    setCartItems((prev) => prev.filter((item) => getCartKey(item) !== key));
-    showToast('Removed item from cart 🗑️');
-  };
-
-  const handleCheckout = () => {
-    const count = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
-    setCartItems([]);
-    showToast(`Order placed! ${count} items on the way ✨`);
+  const handleProceedToPayment = () => {
+    if (cartItems.length === 0) return;
+    navigate('/payment');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOpenCart = () => {
-    setCurrentPage('cart');
-    window.location.hash = '#cart';
+    navigate('/cart');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleGoToHome = () => {
-    setCurrentPage('home');
-    window.location.hash = '#brand-hero';
+    navigate('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleNavigate = (href) => {
-    if (href === '#catalog') {
-      setCurrentPage('catalog');
-      window.location.hash = '#catalog';
+  const handleNavigate = (pathOrHash) => {
+    if (pathOrHash === '/catalog' || pathOrHash === '#catalog') {
+      navigate('/catalog');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    if (href === '#cart') {
+    if (pathOrHash === '/cart' || pathOrHash === '#cart') {
       handleOpenCart();
       return;
     }
-    if (href === '#signup') {
-      setCurrentPage('signup');
-      window.location.hash = '#signup';
+    if (pathOrHash === '/signup' || pathOrHash === '#signup') {
+      navigate('/signup');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (pathOrHash === '/login' || pathOrHash === '#login') {
+      navigate('/login');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (pathOrHash === '/payment' || pathOrHash === '#payment') {
+      handleProceedToPayment();
+      return;
+    }
+    if (pathOrHash === '/account' || pathOrHash === '#account') {
+      navigate('/account');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (pathOrHash === '/admin' || pathOrHash === '#admin') {
+      navigate('/admin');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
-    if (currentPage !== 'home') {
-      setCurrentPage('home');
-      window.location.hash = href;
-      setTimeout(() => {
-        const el = document.querySelector(href);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+    // Anchor hash links like #fit-guide or #street-favorites
+    if (pathOrHash.startsWith('#')) {
+      if (location.pathname !== '/') {
+        navigate('/' + pathOrHash);
+        setTimeout(() => {
+          const el = document.querySelector(pathOrHash);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+        return;
+      }
+      const el = document.querySelector(pathOrHash);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
       return;
     }
 
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    navigate(pathOrHash);
   };
 
   const handleSelectFit = (fit) => {
-    showToast(`Exploring ${fit.category || fit.title} in Catalog! 🎨`);
     const cat = fit.category || '';
     if (cat.toLowerCase().includes('tank') || cat.toLowerCase().includes('tee') || cat.toLowerCase().includes('sweat')) {
       setCatalogCategory('Tops');
@@ -199,83 +173,179 @@ export default function App() {
     } else {
       setCatalogCategory('ALL');
     }
-    setCurrentPage('catalog');
+    navigate('/catalog');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    window.location.hash = '#catalog';
   };
 
-  const handleClaimPromo = () => {
-    showToast(`Claimed 15% discount for 2+ items! 🎉`);
-  };
-
-  const handleSubscribe = (email) => {
-    showToast(`Subscribed ${email} to VIP Drop List! 📩`);
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#2D231E] font-sans selection:bg-[#2D5A27] selection:text-white relative">
       
-      {/* Interactive Toast Notification */}
-      {toast && (
-        <div className="fixed bottom-6 right-6 z-50 animate-bounce pointer-events-none">
-          <div className="py-3 px-5 rounded-2xl bg-[#2D231E] text-[#FAF8F5] border border-[#3D312A] font-bold text-xs shadow-2xl flex items-center gap-2">
-            <span className="text-[#BC5A36]">✨</span>
-            {toast}
-          </div>
-        </div>
-      )}
-
       {/* Product Customizer & Quick View Modal */}
       {selectedProduct && (
-        <ProductModal 
+        <ProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onAddToCart={handleAddToCart}
+          onAddToCart={addToCart}
         />
       )}
 
-      {/* Main Experience: Direct Master Lookbook & Store Catalog */}
-      <Layout 
-        cartCount={cartItems.length}
-        currentPage={currentPage}
+      {/* Main Experience Layout */}
+      <Layout
+        cartCount={cartCount}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        currentPage={
+          location.pathname === '/catalog' ? 'catalog' : 
+          location.pathname === '/cart' ? 'cart' : 
+          location.pathname === '/signup' ? 'signup' : 
+          location.pathname === '/login' ? 'login' : 
+          location.pathname === '/payment' ? 'payment' : 
+          location.pathname === '/account' ? 'account' : 
+          location.pathname === '/admin' ? 'admin' : 
+          'home'
+        }
         onOpenCart={handleOpenCart}
         onNavigate={handleNavigate}
         onGoToLanding={handleGoToHome}
       >
-        {currentPage === 'catalog' ? (
-          <CatalogPage 
-            initialCategory={catalogCategory}
-            onBackToHome={handleGoToHome}
-            onAddToCart={handleAddToCart}
-            onQuickView={(prod) => setSelectedProduct(prod)}
-            onSelectFit={handleSelectFit}
+        <Routes>
+          {/* 1. Home Page */}
+          <Route
+            path="/"
+            element={
+              <HomePage
+                onSelectFit={handleSelectFit}
+                onClaimPromo={() => showToast('Claimed 15% discount code MATCHA15! 🎉')}
+                onAddToCart={addToCart}
+                onQuickView={(prod) => setSelectedProduct(prod)}
+                onExploreCatalog={() => {
+                  navigate('/catalog');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                onSubscribe={(email) => showToast(`Subscribed ${email} to VIP Drop List! 📩`)}
+              />
+            }
           />
-        ) : currentPage === 'cart' ? (
-          <CartPage 
-            cartItems={cartItems}
-            onUpdateQty={handleUpdateQty}
-            onRemove={handleRemoveItem}
-            onBackToStore={handleGoToHome}
-            onCheckout={handleCheckout}
+
+          {/* 2. Catalog Grid Page */}
+          <Route
+            path="/catalog"
+            element={
+              <CatalogPage
+                initialCategory={catalogCategory}
+                onBackToHome={handleGoToHome}
+                onAddToCart={addToCart}
+                onQuickView={(prod) => setSelectedProduct(prod)}
+                onSelectFit={handleSelectFit}
+              />
+            }
           />
-        ) : currentPage === 'signup' ? (
-          <SignUpPage onBackToStore={handleGoToHome} />
-        ) : (
-          <HomePage 
-            onSelectFit={handleSelectFit}
-            onClaimPromo={handleClaimPromo}
-            onAddToCart={handleAddToCart}
-            onQuickView={(prod) => setSelectedProduct(prod)}
-            onExploreWarehouse={() => {
-              setCurrentPage('catalog');
-              window.location.hash = '#catalog';
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onSubscribe={handleSubscribe}
+
+          {/* 3. Personal Color Lab & Diagnostic Quiz */}
+          <Route
+            path="/personal-color"
+            element={<PersonalColorPage />}
           />
-        )}
+
+          {/* 4. Interactive Mix & Match Fashion Studio */}
+          <Route
+            path="/mix-match"
+            element={<MixMatchStudioPage />}
+          />
+
+          {/* 5. High-Fashion Editorial Lookbook */}
+          <Route
+            path="/lookbook"
+            element={<EditorialLookbookPage />}
+          />
+          <Route
+            path="/editorial"
+            element={<EditorialLookbookPage />}
+          />
+
+          {/* 6. Shopping Cart Page */}
+          <Route
+            path="/cart"
+            element={
+              <CartPage
+                cartItems={cartItems}
+                onUpdateQty={updateQty}
+                onRemove={removeItem}
+                onBackToStore={handleGoToHome}
+                onCheckout={handleProceedToPayment}
+              />
+            }
+          />
+
+          {/* 4. Payment / Checkout Page */}
+          <Route 
+            path="/payment" 
+            element={<PaymentPage />} 
+          />
+
+          {/* 5. Login Page */}
+          <Route 
+            path="/login" 
+            element={
+              <LoginPage 
+                onLoginSuccess={(user) => {
+                  login(user);
+                }} 
+              />
+            } 
+          />
+
+          {/* 6. Sign Up Page */}
+          <Route 
+            path="/signup" 
+            element={<SignUpPage onBackToStore={handleGoToHome} />} 
+          />
+
+          {/* 7. User Account Page (Member VIP Lounge) */}
+          <Route
+            path="/account"
+            element={
+              <UserAccount
+                cartCount={cartCount}
+                onOpenCart={handleOpenCart}
+                onNavigate={handleNavigate}
+                onGoToLanding={handleGoToHome}
+                user={currentUser}
+                onAddToCart={addToCart}
+                onLogout={logout}
+              />
+            }
+          />
+
+          {/* 8. Admin Control Center */}
+          <Route
+            path="/admin"
+            element={<AdminPage />}
+          />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </Layout>
 
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ToastProvider>
+      <AuthProvider>
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }

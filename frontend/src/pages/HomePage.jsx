@@ -1,27 +1,30 @@
 import React from 'react';
-import BrandHero from '../components/BrandHero';
-import ChooseYourFit from '../components/ChooseYourFit';
-import StreetFavorites from '../components/StreetFavorites';
-import BrandLoop from '../components/BrandLoop';
-import VdoSection from '../components/VdoSection';
-import PulsePerks from '../components/PulsePerks';
-import JoinDropList from '../components/JoinDropList';
+import BrandHero from '../components/home/BrandHero';
+import ChooseYourFit from '../components/home/ChooseYourFit';
+import StreetFavorites from '../components/home/StreetFavorites';
+import BrandLoop from '../components/home/BrandLoop';
+import VdoSection from '../components/home/VdoSection';
+import PulsePerks from '../components/home/PulsePerks';
+import JoinDropList from '../components/home/JoinDropList';
+import usePrefersReducedMotion from '../hooks/usePrefersReducedMotion';
+import '../styles/home-motion.css';
 
 export default function HomePage({
   onSelectFit,
   onClaimPromo,
   onAddToCart,
   onQuickView,
-  onExploreWarehouse,
+  onExploreCatalog,
   onSubscribe,
 }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const handleScrollToFit = () => {
     const el = document.getElementById('fit-guide');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div className="w-full bg-[#FAF8F5]">
+    <div data-motion={prefersReducedMotion ? 'reduced' : 'full'} className="home-page w-full bg-[#FAF8F5]">
       
       {/* 1. MASTER HERO: Editorial 4-Slice Interactive Lookbook Cover */}
       <section id="brand-hero">
@@ -34,11 +37,11 @@ export default function HomePage({
       </section>
 
       {/* 3. STREET FAVORITES & ARCHIVE: Continuous Framed Carousel with Real Product Shots */}
-      <section id="street-favorites">
+      <section id="street-favorites" data-reveal="products">
         <StreetFavorites 
           onAddToCart={onAddToCart} 
           onQuickView={onQuickView}
-          onExploreCatalog={onExploreWarehouse}
+          onExploreCatalog={onExploreCatalog}
         />
       </section>
 
@@ -46,7 +49,7 @@ export default function HomePage({
       <BrandLoop />
 
       {/* 4. CINEMATIC TEXTURE REEL: Urban Motion Video + 15% Special Promo Glass Card */}
-      <section id="cinematic-reel">
+      <section id="cinematic-reel" data-reveal="film">
         <VdoSection onClaimPromo={onClaimPromo} />
       </section>
 
