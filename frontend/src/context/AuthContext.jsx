@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useToast } from './ToastContext';
+import { setToken } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -17,7 +18,8 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(loadInitialUser);
   const { showToast } = useToast();
 
-  const login = useCallback((userData, rememberMe = true) => {
+  const login = useCallback((userData, rememberMe = true, token = null) => {
+    if (token) setToken(token, rememberMe);
     setCurrentUser(userData);
     if (rememberMe) {
       localStorage.setItem('matcha_user', JSON.stringify(userData));
@@ -29,6 +31,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(() => {
+    setToken(null);
     setCurrentUser(null);
     localStorage.removeItem('matcha_user');
     sessionStorage.removeItem('matcha_user');

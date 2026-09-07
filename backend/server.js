@@ -6,6 +6,7 @@ dns.setServers(['8.8.8.8', '1.1.1.1']);
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const { issueToken, authRequired, adminOnly, selfOrAdmin } = require('./middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -333,7 +334,7 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 // Create Product Endpoint (Task 8.2 & Task 10, Task 6.5)
-app.post(['/api/products', '/api/admin/products'], async (req, res) => {
+app.post(['/api/products', '/api/admin/products'], authRequired, adminOnly, async (req, res) => {
   try {
     const {
       name,
@@ -393,7 +394,7 @@ app.post(['/api/products', '/api/admin/products'], async (req, res) => {
 });
 
 // Update Product / Stock Endpoint (Task 8.3 & Task 6.6)
-app.put(['/api/products/:id', '/api/admin/products/:id'], async (req, res) => {
+app.put(['/api/products/:id', '/api/admin/products/:id'], authRequired, adminOnly, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body };
@@ -429,7 +430,7 @@ app.put(['/api/products/:id', '/api/admin/products/:id'], async (req, res) => {
 });
 
 // Delete Product Endpoint (Task 8.4 & Task 6.7)
-app.delete(['/api/products/:id', '/api/admin/products/:id'], async (req, res) => {
+app.delete(['/api/products/:id', '/api/admin/products/:id'], authRequired, adminOnly, async (req, res) => {
   try {
     const { id } = req.params;
     let deleted = null;
@@ -650,7 +651,111 @@ app.get('/api/orders/:id', async (req, res) => {
 // ==========================================
 
 // List all users / members
-app.get('/api/users', async (req, res) => {
+// Users are addressed by ObjectId, userId or email across the app.
+async function findUserByIdentifier(identifier, withPassword = false) {
+  const select = withPassword ? '+password' : '';
+  let user = null;
+  if (mongoose.Types.ObjectId.isValid(identifier)) {
+    user = await User.findById(identifier).select(select);
+  }
+  if (!user) {
+    user = await User.findOne({
+      $or: [{ userId: identifier }, { email: String(identifier).toLowerCase() }]
+    }).select(select);
+  }
+  return user;
+}
+
+// Shape a user for the client. The password never leaves the server.
+function publicUser(user) {
+  const { password, ...safe } = user.toObject ? user.toObject() : user;
+  return safe;
+}
+
+// ==========================================================
+// AUTHENTICATION
+// ==========================================================
+
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { name, email, password, phone, address } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Name, email and password are required' });
+    }
+    if (String(password).length < 8) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 8 characters' });
+    }
+
+    const existing = await User.findOne({ email: String(email).toLowerCase() });
+    if (existing) {
+      return res.status(409).json({ success: false, message: 'Email is already registered' });
+    }
+
+    // role is deliberately not read from the body: nobody signs themselves up
+    // as an administrator.
+    const user = await new User({
+      name,
+      email: String(email).toLowerCase(),
+      password,
+      role: 'Member',
+      phone: phone || '',
+      address: address || ''
+    }).save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Account created',
+      token: issueToken(user),
+      data: publicUser(user)
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to create account', error: error.message });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required' });
+    }
+
+    const user = await findUserByIdentifier(email, true);
+    // One message for both cases, so the response cannot be used to find out
+    // which addresses are registered.
+    const invalid = { success: false, message: 'Incorrect email or password' };
+    if (!user || !user.password) {
+      return res.status(401).json(invalid);
+    }
+
+    const ok = await user.verifyPassword(password);
+    if (!ok) {
+      return res.status(401).json(invalid);
+    }
+
+    // Upgrade any row still holding a pre-hashing plaintext password.
+    if (!User.isHashed(user.password)) {
+      user.password = password;
+      await user.save();
+    }
+
+    res.json({
+      success: true,
+      message: 'Signed in',
+      token: issueToken(user),
+      data: publicUser(user)
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to sign in', error: error.message });
+  }
+});
+
+app.get('/api/auth/me', authRequired, (req, res) => {
+  res.json({ success: true, data: publicUser(req.user) });
+});
+
+app.get('/api/users', authRequired, adminOnly, async (req, res) => {
   try {
     const { role, tier, search } = req.query;
     const query = {};
@@ -678,7 +783,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Get user by ID or email
-app.get('/api/users/:id', async (req, res) => {
+app.get('/api/users/:id', authRequired, async (req, res) => {
   try {
     const { id } = req.params;
     let user = null;
@@ -698,7 +803,9 @@ app.get('/api/users/:id', async (req, res) => {
 });
 
 // Create new user / member
-app.post('/api/users', async (req, res) => {
+// Administrator-created accounts. Public sign-up goes through
+// POST /api/auth/register, which never honours a role from the body.
+app.post('/api/users', authRequired, adminOnly, async (req, res) => {
   try {
     const { name, email, password, role, tier, phone, address } = req.body;
 
@@ -734,22 +841,29 @@ app.post('/api/users', async (req, res) => {
 });
 
 // Update user info or tier
-app.put('/api/users/:id', async (req, res) => {
+app.put('/api/users/:id', authRequired, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body };
 
-    let updated = null;
-    if (mongoose.Types.ObjectId.isValid(id)) {
-      updated = await User.findByIdAndUpdate(id, updateData, { returnDocument: 'after', runValidators: true });
-    }
-    if (!updated) {
-      updated = await User.findOneAndUpdate({ $or: [{ userId: id }, { email: id }] }, updateData, { returnDocument: 'after', runValidators: true });
-    }
-
-    if (!updated) {
+    const target = await findUserByIdentifier(id);
+    if (!target) {
       return res.status(404).json({ success: false, message: 'User not found to update' });
     }
+
+    const isAdmin = req.user.role === 'Admin';
+    if (!isAdmin && String(target._id) !== String(req.user._id)) {
+      return res.status(403).json({ success: false, message: 'You may only modify your own account' });
+    }
+    // Privilege and credentials are not ordinary profile fields.
+    if (!isAdmin) {
+      delete updateData.role;
+      delete updateData.tier;
+    }
+    delete updateData.password;
+
+    Object.assign(target, updateData);
+    const updated = await target.save();
 
     res.json({
       success: true,
@@ -762,20 +876,19 @@ app.put('/api/users/:id', async (req, res) => {
 });
 
 // Delete user
-app.delete('/api/users/:id', async (req, res) => {
+app.delete('/api/users/:id', authRequired, async (req, res) => {
   try {
     const { id } = req.params;
-    let deleted = null;
-    if (mongoose.Types.ObjectId.isValid(id)) {
-      deleted = await User.findByIdAndDelete(id);
-    }
-    if (!deleted) {
-      deleted = await User.findOneAndDelete({ $or: [{ userId: id }, { email: id }] });
-    }
 
-    if (!deleted) {
+    const target = await findUserByIdentifier(id);
+    if (!target) {
       return res.status(404).json({ success: false, message: 'User not found to delete' });
     }
+    if (req.user.role !== 'Admin' && String(target._id) !== String(req.user._id)) {
+      return res.status(403).json({ success: false, message: 'You may only close your own account' });
+    }
+
+    const deleted = await User.findByIdAndDelete(target._id);
 
     res.json({
       success: true,

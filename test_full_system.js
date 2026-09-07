@@ -3,9 +3,14 @@
 
 const BASE_URL = 'http://localhost:5000/api';
 
+// Administrator routes now require a bearer token. The suite signs in the same
+// way the app does, using the seeded credentials from backend/.env.
+let authToken = null;
+
 async function request(endpoint, options = {}) {
   const headers = {
     'Content-Type': 'application/json',
+    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
     ...(options.headers || {})
   };
   const res = await fetch(`${BASE_URL}${endpoint}`, {
@@ -40,6 +45,40 @@ async function runFullAudit() {
   console.log('\n======================================================');
   console.log('🍵 MatchA Full-Stack E2E Audit & Verification Suite');
   console.log('======================================================\n');
+
+  // --- Sign in before anything that needs privileges ---
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@matcha.vip';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+  if (!adminPassword) {
+    console.error('  ⚠️  SEED_ADMIN_PASSWORD is not set. Run the suite with backend/.env loaded:');
+    console.error('      node -r dotenv/config test_full_system.js dotenv_config_path=backend/.env');
+    process.exit(1);
+  }
+
+  console.log('--- [0] Authentication (admin sign-in) ---');
+  const signIn = await request('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email: adminEmail, password: adminPassword })
+  });
+  assert(signIn.status === 200 && Boolean(signIn.body.token), 'POST /api/auth/login returns a token for the administrator',
+    `status ${signIn.status}`);
+  assert(signIn.body.data && signIn.body.data.password === undefined, 'Sign-in response never carries the stored credential');
+  authToken = signIn.body.token;
+
+  const wrongPass = await request('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email: adminEmail, password: 'definitely-not-the-password' })
+  });
+  assert(wrongPass.status === 401, 'An incorrect credential is rejected with 401', `status ${wrongPass.status}`);
+
+  const savedToken = authToken;
+  authToken = null;
+  const unguarded = await request('/users');
+  assert(unguarded.status === 401, 'GET /api/users refuses an anonymous caller', `status ${unguarded.status}`);
+  const unguardedWrite = await request('/products', { method: 'POST', body: JSON.stringify({ name: 'x' }) });
+  assert(unguardedWrite.status === 401, 'POST /api/products refuses an anonymous caller', `status ${unguardedWrite.status}`);
+  authToken = savedToken;
+  console.log('');
 
   const testSuffix = Date.now().toString().slice(-4);
   const testSKU = `SKU-AUDIT-${testSuffix}`;

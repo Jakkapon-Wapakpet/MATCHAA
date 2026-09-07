@@ -37,9 +37,12 @@ MatchA/
 │   ├── backend/                      # Express REST API & Database Layer
 │   │   ├── config/                   # Database connection configuration
 │   │   ├── data/                     # Seed catalog database
+│   │   ├── middleware/               # Token verification & role guards
 │   │   ├── models/                   # Mongoose schemas (Product, Cart, Order, User)
-│   │   ├── seed.js                   # MongoDB Atlas seeder
-│   │   └── server.js                 # Express server & REST CRUD endpoints
+│   │   ├── seed.js                   # MongoDB Atlas catalogue seeder
+│   │   ├── seedUsers.js              # Creates the admin/member sign-in accounts
+│   │   ├── .env.example              # Required environment keys (no values)
+│   │   └── server.js                 # Express server, auth & REST CRUD endpoints
 │   ├── frontend/                     # React Single Page Application (SPA)
 │   │   ├── public/
 │   │   │   └── images/
@@ -55,7 +58,7 @@ MatchA/
 │   │       ├── services/             # API client services
 │   │       └── utils/                # Personal color theory & image fallback handlers
 │   ├── package.json                  # Workspace runner (Concurrently dev server)
-│   └── test_full_system.js           # 25-point automated E2E system verification suite
+│   └── test_full_system.js           # 30-check automated E2E system verification suite
 ├── docs/                             # Technical specs, architecture docs, color theory guide
 └── Requirement/                      # Sprint backlogs, wireframes, ERDs, and design artifacts
 ```
@@ -75,10 +78,31 @@ npm run install:all
 ```
 
 ### 3. Environment Setup
-Verify `backend/.env` contains your database connection string:
+Copy `backend/.env.example` to `backend/.env` and fill it in:
 ```env
 PORT=5000
-MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.hak50ja.mongodb.net/MatchA?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/MatchA?retryWrites=true&w=majority
+
+# Signs session tokens — use a long random value, unique per environment
+JWT_SECRET=<generate one>
+
+# Credentials for the demo accounts created by `npm run seed:users`
+SEED_ADMIN_PASSWORD=<choose one>
+SEED_MEMBER_PASSWORD=<choose one>
+```
+
+Generate a token secret with:
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+```
+
+> `backend/.env` is gitignored and must never be committed. `backend/.env.example`
+> documents the required keys and carries no values.
+
+### 3.1 Seed the sign-in accounts
+```bash
+npm run seed --prefix backend        # product catalogue
+npm run seed:users --prefix backend  # admin + member accounts (bcrypt hashed)
 ```
 
 ### 4. Run Development Server
@@ -100,7 +124,11 @@ Run the automated full-stack E2E audit suite:
 ```bash
 npm test
 ```
+Runs 30 checks. The suite signs in as the administrator first, then exercises
+the protected routes with that token and confirms anonymous callers are refused.
+
 **Verification Scope:**
+- Administrator sign-in, rejection of a wrong credential, and refusal of anonymous access to protected routes
 - Backend health check & categories API
 - Product catalog query filters & pagination
 - Strict product validation guardrails (Task 10.3)
@@ -111,8 +139,39 @@ npm test
 
 ---
 
-## 🔒 Security & Git Hygiene
+## 🔒 Authentication & Authorization
 
-- **Sensitive credentials (`.env`)** are strictly excluded via `.gitignore`.
-- **Large binary assets (`images/lookbook_flatlay/*`)** are tracked cleanly via `.gitkeep` without inflating git history.
-- Local repository commits follow conventional commit specifications (`feat:`, `fix:`, `chore:`).
+Sign-in is decided by the server. The browser is told the outcome; it does not
+work it out for itself.
+
+| Concern | How it is handled |
+| :--- | :--- |
+| Passwords | Hashed with bcrypt (10 rounds) in a `pre('save')` hook on the User model, so no route can write a plaintext value by forgetting to |
+| Storage | The `password` field is `select: false` and stripped from every response — it is never sent to a client |
+| Sessions | A JWT signed with `JWT_SECRET`, valid 7 days, sent as `Authorization: Bearer <token>` |
+| Role checks | Read from the database on each request, not from the token, so a demotion takes effect immediately |
+| Sign-up | `POST /api/auth/register` never honours a `role` from the request body — nobody registers themselves as an administrator |
+| Failed sign-in | One message for an unknown address and a wrong password alike, so responses cannot be used to discover registered emails |
+
+**Protected routes**
+
+| Route | Requires |
+| :--- | :--- |
+| `POST` `PUT` `DELETE` `/api/products/:id` | Administrator |
+| `GET /api/users` · `POST /api/users` | Administrator |
+| `GET` `PUT` `DELETE` `/api/users/:id` | Signed in; own account only unless Administrator |
+| Everything else (catalogue, cart, orders) | Open |
+
+A member editing their own profile cannot change `role` or `tier`, and cannot
+change a password through the profile route.
+
+### Git hygiene
+- **`backend/.env`** is gitignored and has never been committed — verified across the full history.
+- **`backend/.env.example`** is committed instead, documenting the required keys with no values.
+- **Large binary assets (`images/lookbook_flatlay/*`)** are tracked via `.gitkeep` without inflating git history.
+- Commits follow conventional commit specifications (`feat:`, `fix:`, `chore:`).
+
+### Known limitations
+- Social sign-in buttons are placeholders and are disabled; no OAuth provider is wired up.
+- There is no rate limiting on the sign-in route, and no password-reset delivery — the "forgot password" dialog is UI only.
+- The admin Orders and Members tables fall back to seeded sample rows when the API returns nothing, so an empty database still demonstrates the layout.

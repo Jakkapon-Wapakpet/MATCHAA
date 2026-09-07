@@ -33,8 +33,8 @@ export default function SignupForm({ onBackToStore }) {
     e.preventDefault();
     setError('');
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters.');
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters.');
       return;
     }
 
@@ -58,21 +58,32 @@ export default function SignupForm({ onBackToStore }) {
     };
 
     try {
-      await api.createUser({
+      // The account has to exist on the server before we call anyone signed in;
+      // a failure here is a failure to register, not a warning to swallow.
+      const res = await api.register({
         name: newUser.name,
         email: newUser.email,
-        password: newUser.password,
-        role: 'Member',
-        tier: 'VIP Connoisseur'
+        password: newUser.password
       });
+      const account = res.data || {};
+      login(
+        {
+          id: account._id,
+          name: account.name || newUser.name,
+          email: account.email || newUser.email,
+          role: account.role || 'Member',
+          tier: account.tier
+        },
+        true,
+        res.token
+      );
+      showToast(`Account created for ${newUser.name}! Welcome to VIP Archive 🎉`);
+      navigate('/');
     } catch (err) {
-      console.warn('Backend user creation notice:', err.message);
+      setError(err.message || 'Could not create your account. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-    login(newUser);
-    showToast(`Account created for ${newUser.name}! Welcome to VIP Archive 🎉`);
-    navigate('/');
   };
 
   return (
