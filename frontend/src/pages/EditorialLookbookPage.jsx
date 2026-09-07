@@ -752,7 +752,7 @@ export default function EditorialLookbookPage() {
                     magazine gutter reads when you turn the page slowly. */}
                 <div
                   data-drift
-                  style={{ '--drift-from': '52px', '--drift-to': '-52px' }}
+                  style={{ '--drift-from': '30px', '--drift-to': '-30px' }}
                   className={`lg:col-span-5 space-y-6 ${isEven ? 'lg:order-2' : 'lg:order-1'}`}
                 >
                   
