@@ -2,7 +2,7 @@
   "name": "matcha-fullstack",
   "version": "1.0.0",
   "private": true,
-  "description": "MatchA - Modern Artisan Tea & Beverage Full-Stack App (React Vite + Express)",
+  "description": "MatchA - Modern Japanese Artisan Streetwear & E-Commerce Full-Stack Platform (React 18, Express, MongoDB Atlas)",
   "scripts": {
     "build": "npm run build --prefix frontend",
     "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
