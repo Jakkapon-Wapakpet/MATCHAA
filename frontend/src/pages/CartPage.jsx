@@ -1,4 +1,5 @@
 import React from 'react';
+import useChangeMotion from '../hooks/useChangeMotion';
 import { Trash2, ArrowLeft, Lock } from 'lucide-react';
 
 const parsePrice = (price) => parseFloat(String(price).replace(/[^0-9.]/g, '')) || 0;
@@ -6,6 +7,7 @@ const parsePrice = (price) => parseFloat(String(price).replace(/[^0-9.]/g, '')) 
 const getCartKey = (item) => `${item.id}-${item.size || 'default'}-${item.color || 'default'}`;
 
 export default function CartPage({ cartItems = [], onUpdateQty, onRemove, onBackToStore, onCheckout }) {
+  const cartMotionRef = useChangeMotion(cartItems.map(item => `${getCartKey(item)}:${item.quantity}`).join('|'), 'outfit');
   const subtotal = cartItems.reduce((sum, item) => sum + parsePrice(item.price) * (item.quantity || 1), 0);
   const shipping = cartItems.length === 0 || subtotal >= 100 ? 0 : 10;
   const total = subtotal + shipping;
@@ -54,7 +56,7 @@ export default function CartPage({ cartItems = [], onUpdateQty, onRemove, onBack
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
           {/* Cart Items List */}
-          <div className="lg:col-span-7 flex flex-col gap-4">
+          <div ref={cartMotionRef} className="lg:col-span-7 flex flex-col gap-4">
             {cartItems.map((item) => {
               const key = getCartKey(item);
               const qty = item.quantity || 1;
@@ -62,6 +64,7 @@ export default function CartPage({ cartItems = [], onUpdateQty, onRemove, onBack
               return (
                 <div
                   key={key}
+                  data-motion-slot={key} data-motion-item={`${key}:${item.quantity}`}
                   className="flex gap-4 p-5 bg-white rounded-3xl border border-[#D9D3C7] shadow-sm hover:shadow-md transition-shadow"
                 >
                   {/* Thumbnail */}

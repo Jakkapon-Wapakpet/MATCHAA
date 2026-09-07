@@ -1,43 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 
-export default function BrandHero({ onShopNow, onEnterWebsite }) {
-  const sectionRef = useRef(null);
-  const [stickyOffset, setStickyOffset] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
-
-  // Guarantee silky-smooth sticky pinning and dynamic scale-down on scroll
-  useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (!sectionRef.current) return;
-          const rect = sectionRef.current.getBoundingClientRect();
-          const maxShift = sectionRef.current.offsetHeight - window.innerHeight;
-
-          if (rect.top <= 0 && rect.bottom >= 150) {
-            const shift = Math.min(Math.max(-rect.top, 0), maxShift > 0 ? maxShift : 0);
-            setStickyOffset(shift);
-            if (maxShift > 0) {
-              const progress = Math.min(Math.max(-rect.top / maxShift, 0), 1);
-              setScrollProgress(progress);
-            }
-          } else if (rect.top > 0) {
-            setStickyOffset(0);
-            setScrollProgress(0);
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-  // 10 Strictly Verified Studio White Background Front-Facing Models (100% Facing Forward)
+export default function BrandHero({ onShopNow, onEnterWebsite, motionEnabled = true }) {
+  // Studio model references for the four independently shuffled slices.
   const models = [
     {
       id: 'LOOK-01',
@@ -111,7 +76,7 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
   // Auto-play interval effect for active running slices with randomized selection (1.30 seconds)
   useEffect(() => {
     const hasAnyPlaying = slicePlaying.some((p) => p);
-    if (!hasAnyPlaying) return;
+    if (!hasAnyPlaying || !motionEnabled) return;
 
     const interval = setInterval(() => {
       setSliceModels((prev) => {
@@ -129,7 +94,7 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
     }, 1300);
 
     return () => clearInterval(interval);
-  }, [slicePlaying, models.length]);
+  }, [slicePlaying, models.length, motionEnabled]);
 
 
 
@@ -169,26 +134,16 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
     }
   };
 
-  // Dynamic Scale-Down on Scroll: Starts at full 1.0 size, smoothly scales down to 0.65x as user scrolls down
-  const titleScale = Math.max(1 - scrollProgress * 0.35, 0.65);
-  const titleOpacity = Math.max(1 - scrollProgress * 0.2, 0.8);
-
   return (
-    <section 
-      ref={sectionRef}
+    <section
       className="relative w-full bg-[#FAF8F5] text-[#2D231E] min-h-[145vh] pt-2 pb-12 px-4 sm:px-8 lg:px-12 flex flex-col justify-between select-none border-b border-[#D9D3C7]"
     >
       
-      {/* 1. Header Title: Positioned high near top navbar, scales down smoothly as user scrolls */}
+      {/* The masthead reveals once and then follows normal document scrolling. */}
       <div 
-        className="w-full text-center z-0 pointer-events-none select-none pt-1 sm:pt-3 -mb-4 sm:-mb-6 md:-mb-8 relative origin-top"
-        style={{
-          transform: `translateY(${stickyOffset}px) scale(${titleScale})`,
-          opacity: titleOpacity,
-          transition: 'transform 0.04s ease-out, opacity 0.04s ease-out',
-        }}
+        className="w-full text-center z-0 pointer-events-none select-none pt-1 sm:pt-3 -mb-4 sm:-mb-6 md:-mb-8 relative origin-top home-masthead"
       >
-        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10.5rem] font-black tracking-tight uppercase leading-none inline-block whitespace-nowrap drop-shadow-sm font-sans">
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10.5rem] font-black tracking-tight uppercase leading-none inline-block whitespace-nowrap drop-shadow-sm font-sans home-masthead-title">
           <span className="text-[#2D5A27]">MATCH</span>
           <span className="text-[#BC5A36]">A</span>
         </h1>

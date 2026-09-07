@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useChangeMotion from '../hooks/useChangeMotion';
 import { 
   Sparkles, 
   Camera, 
@@ -109,6 +110,7 @@ export default function EditorialLookbookPage() {
   const { showToast } = useToast();
 
   const [selectedSeason, setSelectedSeason] = useState('ALL');
+  const editorialMotionRef = useChangeMotion(selectedSeason);
   const [selectedSpread, setSelectedSpread] = useState(null);
   const [activeHotspot, setActiveHotspot] = useState(null);
   const [hoveredItemId, setHoveredItemId] = useState(null);
@@ -347,7 +349,7 @@ export default function EditorialLookbookPage() {
         {/* 2. THE COVER STORY: FULL-BLEED EDITORIAL MASTERPIECE WITH 3D TILT & HOTSPOTS */}
         {/* ========================================================================= */}
         {coverStory && (
-          <div key={`cover-${coverStory.id}-${selectedSeason}`} className="animate-editorial-reveal">
+          <div ref={editorialMotionRef} key={`cover-${coverStory.id}-${selectedSeason}`}>
             <TiltCard 
               enabled={true} 
               maxTilt={2.5}

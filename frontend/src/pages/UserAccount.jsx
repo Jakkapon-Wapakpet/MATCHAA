@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useChangeMotion from '../hooks/useChangeMotion';
 import {
   Package,
   Heart,
@@ -29,6 +30,7 @@ export default function UserAccount() {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('details');
+  const accountMotionRef = useChangeMotion(activeTab);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -251,7 +253,7 @@ export default function UserAccount() {
           </div>
 
           {/* Right Content Area */}
-          <div className="lg:col-span-8">
+          <div ref={accountMotionRef} className="lg:col-span-8">
             {activeTab === 'details' && (
               <ProfileTab
                 profile={profile}

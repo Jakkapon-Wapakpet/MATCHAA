@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import useChangeMotion from '../hooks/useChangeMotion';
 import { Sparkles, ArrowLeft, RotateCcw } from 'lucide-react';
 import { api } from '../services/api';
 import ProductCard from '../components/product/ProductCard';
@@ -149,6 +150,7 @@ export default function CatalogPage({
   }, [products, currentPage, itemsPerPage]);
 
   const startIndex = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const gridMotionRef = useChangeMotion(`${loading}-${gridCols}-${paginatedProducts.map(product => product.id).join('|')}`, 'grid');
   const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
 
   // Grid class mapping
@@ -277,7 +279,7 @@ export default function CatalogPage({
             onAction={handleResetFilters}
           />
         ) : (
-          <div className={`grid ${gridClasses} gap-6`}>
+          <div ref={gridMotionRef} className={`grid ${gridClasses} gap-6`}>
             {paginatedProducts.map((product) => (
               <ProductCard
                 key={product.id}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useChangeMotion from '../hooks/useChangeMotion';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import ShippingStep from '../components/payment/ShippingStep';
@@ -56,6 +57,7 @@ export default function PaymentPage() {
   const { showToast } = useToast();
 
   const [step, setStep] = useState('shipping'); // 'shipping' | 'payment'
+  const stepMotionRef = useChangeMotion(step);
   const [selectedPayment, setSelectedPayment] = useState('visa');
   const [selectedShipping, setSelectedShipping] = useState('standard');
   const [formData, setFormData] = useState(initialFormData);
@@ -183,7 +185,7 @@ export default function PaymentPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Main Form Steps (Left Column) */}
-          <div className="lg:col-span-7">
+          <div ref={stepMotionRef} className="lg:col-span-7">
             {step === 'shipping' ? (
               <ShippingStep
                 formData={formData}

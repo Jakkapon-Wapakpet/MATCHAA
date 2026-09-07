@@ -190,6 +190,7 @@ export default function AdminPage() {
 
   // Active Tab View: 'dashboard' | 'inventory' | 'orders' | 'analytics' | 'members' | 'backup'
   const [activeTab, setActiveTab] = useState('dashboard');
+  const adminMotionRef = useChangeMotion(activeTab);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
 
@@ -728,7 +729,7 @@ export default function AdminPage() {
         </header>
 
         {/* Dashboard Body Area */}
-        <div className="p-6 max-w-7xl w-full mx-auto space-y-8">
+        <div ref={adminMotionRef} className="p-6 max-w-7xl w-full mx-auto space-y-8">
           
           {/* ========================================================================= */}
           {/* TAB 1: OVERVIEW & KPIS (EXECUTIVE DASHBOARD)                              */}
@@ -1365,3 +1366,4 @@ export default function AdminPage() {
     </div>
   );
 }
+import useChangeMotion from '../hooks/useChangeMotion';

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useChangeMotion from '../hooks/useChangeMotion';
 import { 
   Sparkles, 
   CheckCircle2, 
@@ -166,6 +167,7 @@ export default function PersonalColorPage() {
   });
   const [isScanning, setIsScanning] = useState(false);
   const [selectedSeasonTab, setSelectedSeasonTab] = useState('Autumn');
+  const questionMotionRef = useChangeMotion(`${activeTab}-${currentStep}-${diagnosedSeason}-${isScanning}`);
 
   // Handle Option Click
   const handleSelectOption = (questionId, option) => {
@@ -291,7 +293,7 @@ export default function PersonalColorPage() {
                 </div>
 
                 {/* Current Question */}
-                <div className="space-y-6">
+                <div ref={questionMotionRef} className="space-y-6">
                   <div className="space-y-2">
                     <span className="text-[11px] font-mono font-bold uppercase text-[#BC5A36] tracking-wider flex items-center gap-1.5">
                       {QUIZ_QUESTIONS[currentStep].icon}
