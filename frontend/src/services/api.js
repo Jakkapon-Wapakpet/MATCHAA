@@ -3,23 +3,33 @@ import { productsData } from '../data/productsData';
 const API_BASE = '/api';
 const DIRECT_API = 'http://localhost:5000/api';
 
-async function fetchWithFallback(endpoint) {
+async function fetchWithFallback(endpoint, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+  const config = { ...options, headers };
+
   try {
-    const res = await fetch(`${API_BASE}${endpoint}`);
+    const res = await fetch(`${API_BASE}${endpoint}`, config);
     if (res.ok) return await res.json();
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || `Request failed with status ${res.status}`);
   } catch (err) {
-    // try direct
+    if (err.message && !err.message.includes('Failed to fetch') && !err.message.includes('NetworkError')) {
+      throw err;
+    }
   }
 
   // Fallback to direct backend URL
   try {
-    const directRes = await fetch(`${DIRECT_API}${endpoint}`);
+    const directRes = await fetch(`${DIRECT_API}${endpoint}`, config);
     if (directRes.ok) return await directRes.json();
+    const errorData = await directRes.json().catch(() => ({}));
+    throw new Error(errorData.message || `Direct request failed with status ${directRes.status}`);
   } catch (err) {
-    // ignore
+    throw new Error(err.message || `Failed to communicate with backend at ${endpoint}`);
   }
-
-  throw new Error(`Failed to communicate with backend at ${endpoint}`);
 }
 
 export const api = {
@@ -31,6 +41,98 @@ export const api = {
   // Fetch sample items from backend
   getItems: async () => {
     return fetchWithFallback('/items');
+  },
+
+  // Product CRUD
+  createProduct: async (productData) => {
+    return fetchWithFallback('/products', {
+      method: 'POST',
+      body: JSON.stringify(productData)
+    });
+  },
+
+  updateProduct: async (id, updateData) => {
+    return fetchWithFallback(`/products/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData)
+    });
+  },
+
+  deleteProduct: async (id) => {
+    return fetchWithFallback(`/products/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
+  // Orders CRUD
+  getOrders: async () => {
+    return fetchWithFallback('/orders');
+  },
+
+  createOrder: async (orderData) => {
+    return fetchWithFallback('/orders', {
+      method: 'POST',
+      body: JSON.stringify(orderData)
+    });
+  },
+
+  getOrderById: async (id) => {
+    return fetchWithFallback(`/orders/${id}`);
+  },
+
+  // Cart CRUD
+  getCart: async (userId = 'guest') => {
+    return fetchWithFallback(`/cart?userId=${encodeURIComponent(userId)}`);
+  },
+
+  addToCart: async (item, userId = 'guest') => {
+    return fetchWithFallback('/cart', {
+      method: 'POST',
+      body: JSON.stringify({ userId, item })
+    });
+  },
+
+  updateCartItem: async (itemId, quantity, userId = 'guest') => {
+    return fetchWithFallback(`/cart/${encodeURIComponent(itemId)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ userId, quantity })
+    });
+  },
+
+  deleteCartItem: async (itemId, userId = 'guest') => {
+    return fetchWithFallback(`/cart/${encodeURIComponent(itemId)}?userId=${encodeURIComponent(userId)}`, {
+      method: 'DELETE'
+    });
+  },
+
+  // Users CRUD
+  getUsers: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return fetchWithFallback(`/users${query ? `?${query}` : ''}`);
+  },
+
+  getUserById: async (id) => {
+    return fetchWithFallback(`/users/${id}`);
+  },
+
+  createUser: async (userData) => {
+    return fetchWithFallback('/users', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  },
+
+  updateUser: async (id, updateData) => {
+    return fetchWithFallback(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData)
+    });
+  },
+
+  deleteUser: async (id) => {
+    return fetchWithFallback(`/users/${id}`, {
+      method: 'DELETE'
+    });
   },
 
   // Fetch categories with product counts

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 import { User, Mail, Lock, ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
 
 export default function SignupForm({ onBackToStore }) {
@@ -28,7 +29,7 @@ export default function SignupForm({ onBackToStore }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -44,22 +45,34 @@ export default function SignupForm({ onBackToStore }) {
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
-      const newUser = {
-        name: fullName || formData.email.split('@')[0],
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        role: 'Member',
-        badge: '🟢 VIP MEMBER',
-      };
+    const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+    const newUser = {
+      name: fullName || formData.email.split('@')[0],
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password,
+      role: 'Member',
+      tier: 'VIP Connoisseur',
+      badge: '🟢 VIP MEMBER',
+    };
 
-      login(newUser);
-      showToast(`Account created for ${newUser.name}! Welcome to VIP Archive 🎉`);
-      navigate('/');
-    }, 150);
+    try {
+      await api.createUser({
+        name: newUser.name,
+        email: newUser.email,
+        password: newUser.password,
+        role: 'Member',
+        tier: 'VIP Connoisseur'
+      });
+    } catch (err) {
+      console.warn('Backend user creation notice:', err.message);
+    }
+
+    setIsLoading(false);
+    login(newUser);
+    showToast(`Account created for ${newUser.name}! Welcome to VIP Archive 🎉`);
+    navigate('/');
   };
 
   return (

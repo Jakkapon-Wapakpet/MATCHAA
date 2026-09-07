@@ -12,7 +12,7 @@ export default function HomePage({
   onClaimPromo,
   onAddToCart,
   onQuickView,
-  onExploreWarehouse,
+  onExploreCatalog,
   onSubscribe,
 }) {
   const handleScrollToFit = () => {
@@ -38,7 +38,7 @@ export default function HomePage({
         <StreetFavorites 
           onAddToCart={onAddToCart} 
           onQuickView={onQuickView}
-          onExploreCatalog={onExploreWarehouse}
+          onExploreCatalog={onExploreCatalog}
         />
       </section>
 

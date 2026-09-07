@@ -14,6 +14,8 @@ Alldata.md
 *Alldata*.md
 StepUp-01.md
 *StepUp*.md
+Sprint-01.md
+*Sprint*.md
 interview.md
 *interview*.md
 *scratch*.js
@@ -98,6 +100,9 @@ lerna-debug.log*
 ehthumbs.db
 Thumbs.db
 desktop.ini
+.agents/
+.claude/
+.codex/
 .vscode/
 !.vscode/settings.json
 .idea/
@@ -113,8 +118,10 @@ desktop.ini
 *.orig
 
 # 9. AI Agent Caches, Knowledge Graphs & Index Directories
-.agents/
 .agents/*
+!.agents/skills/
+!.agents/rules/
+!.agents/plugins/
 .claude/
 .claude/*
 .gemini/
@@ -154,3 +161,22 @@ MatchA_Orders_*.csv
 MatchA_Revenue_*.csv
 MatchA_VIP_*.csv
 MatchA_Full_Store_Backup_*.json
+
+# 13. Python Bytecode, Caches & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+venv/
+.venv/
+env/
+ENV/
+
+# 14. Diagram Design & Tooling Local Artifacts
+.diagram-design
+*.drawio.bkp
+*.drawio.dtmp
+

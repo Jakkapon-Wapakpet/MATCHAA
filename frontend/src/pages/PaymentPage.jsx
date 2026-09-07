@@ -6,6 +6,7 @@ import ShippingStep from '../components/payment/ShippingStep';
 import PaymentMethodStep from '../components/payment/PaymentMethodStep';
 import OrderSummarySidebar from '../components/payment/OrderSummarySidebar';
 import OrderSuccessModal from '../components/payment/OrderSuccessModal';
+import { api } from '../services/api';
 import { QrCode, Truck, Shield } from 'lucide-react';
 
 const PAYMENT_METHODS = [
@@ -64,6 +65,7 @@ export default function PaymentPage() {
   const [couponError, setCouponError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdOrder, setCreatedOrder] = useState(null);
 
   useEffect(() => {
     if (cartItems.length === 0 && !showSuccessModal) {
@@ -109,13 +111,41 @@ export default function PaymentPage() {
     showToast('Removed promotional coupon.');
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     setIsProcessing(true);
-    setTimeout(() => {
+    try {
+      const orderPayload = {
+        customer: formData,
+        items: cartItems.map(item => ({
+          productId: item.id || item.productId || 'SKU-ITEM',
+          name: item.name || 'MatchA Garment',
+          price: Number(item.price) || 0,
+          quantity: Number(item.quantity) || 1,
+          size: item.size || 'M',
+          color: item.color || 'Default',
+          image: item.image || ''
+        })),
+        subtotal: Number(subtotal) || 0,
+        discount: Number(discount) || 0,
+        shippingFee: Number(shippingCost) || 0,
+        total: Number(total) || 0,
+        paymentMethod: selectedPayment,
+        shippingOption: selectedShipping
+      };
+
+      const res = await api.createOrder(orderPayload);
+      if (res && res.data) {
+        setCreatedOrder(res.data);
+      }
+      showToast('Order confirmed and recorded in MongoDB Atlas! 🎉', 'success');
+    } catch (err) {
+      console.warn('Backend order creation fallback:', err.message);
+      showToast('Order confirmed locally: ' + err.message, 'info');
+    } finally {
       setIsProcessing(false);
       setShowSuccessModal(true);
       clearCart();
-    }, 1200);
+    }
   };
 
   return (
@@ -204,6 +234,7 @@ export default function PaymentPage() {
         {/* Order Confirmation Receipt Modal */}
         <OrderSuccessModal
           isOpen={showSuccessModal}
+          orderNumber={createdOrder?.orderId || `MTA-2026-${Math.floor(1000 + Math.random() * 9000)}`}
           formData={formData}
           totalAmount={total}
           onDone={() => setShowSuccessModal(false)}

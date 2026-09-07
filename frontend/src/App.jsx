@@ -11,6 +11,9 @@ import LoginPage from './pages/LoginPage';
 import Payment from './pages/Payment';
 import UserAccount from './pages/UserAccount';
 import AdminPage from './pages/AdminPage';
+import PersonalColorPage from './pages/PersonalColorPage';
+import MixMatchStudioPage from './pages/MixMatchStudioPage';
+import EditorialLookbookPage from './pages/EditorialLookbookPage';
 import Layout from './components/layout/Layout';
 import ProductModal from './components/product/ProductModal';
 
@@ -221,7 +224,7 @@ function AppContent() {
                 onClaimPromo={() => showToast('Claimed 15% discount code MATCHA15! 🎉')}
                 onAddToCart={addToCart}
                 onQuickView={(prod) => setSelectedProduct(prod)}
-                onExploreWarehouse={() => {
+                onExploreCatalog={() => {
                   navigate('/catalog');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
@@ -244,7 +247,29 @@ function AppContent() {
             }
           />
 
-          {/* 3. Shopping Cart Page */}
+          {/* 3. Personal Color Lab & Diagnostic Quiz */}
+          <Route
+            path="/personal-color"
+            element={<PersonalColorPage />}
+          />
+
+          {/* 4. Interactive Mix & Match Fashion Studio */}
+          <Route
+            path="/mix-match"
+            element={<MixMatchStudioPage />}
+          />
+
+          {/* 5. High-Fashion Editorial Lookbook */}
+          <Route
+            path="/lookbook"
+            element={<EditorialLookbookPage />}
+          />
+          <Route
+            path="/editorial"
+            element={<EditorialLookbookPage />}
+          />
+
+          {/* 6. Shopping Cart Page */}
           <Route
             path="/cart"
             element={
