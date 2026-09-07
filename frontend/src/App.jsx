@@ -224,7 +224,7 @@ function AppContent() {
                 onClaimPromo={() => showToast('Claimed 15% discount code MATCHA15! 🎉')}
                 onAddToCart={addToCart}
                 onQuickView={(prod) => setSelectedProduct(prod)}
-                onExploreWarehouse={() => {
+                onExploreCatalog={() => {
                   navigate('/catalog');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
