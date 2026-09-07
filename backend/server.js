@@ -43,6 +43,8 @@ app.get('/api/health', (req, res) => {
 
 
 const Product = require('./models/Product');
+const Cart = require('./models/Cart');
+const Order = require('./models/Order');
 const productsData = require('./data/products');
 
 // Sample Starter API endpoint
@@ -446,6 +448,194 @@ app.delete('/api/products/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting product:', error);
     res.status(500).json({ success: false, message: 'Failed to delete product', error: error.message });
+  }
+});
+
+// ==========================================
+// Cart CRUD Endpoints (Task 8.5, 8.6, 8.7)
+// ==========================================
+
+// Get user cart
+app.get('/api/cart', async (req, res) => {
+  try {
+    const userId = req.query.userId || 'guest';
+    let cart = await Cart.findOne({ userId });
+    if (!cart) {
+      cart = { userId, items: [], totalAmount: 0 };
+    }
+    res.json({ success: true, data: cart });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to retrieve cart', error: error.message });
+  }
+});
+
+// Add item to cart (Task 8.5)
+app.post('/api/cart', async (req, res) => {
+  try {
+    const { userId = 'guest', item } = req.body;
+    if (!item || !item.productId) {
+      return res.status(400).json({ success: false, message: 'Item and productId are required' });
+    }
+
+    const itemId = item.itemId || `${item.productId}-${item.size || 'M'}-${item.color || 'Default'}`;
+    let cart = await Cart.findOne({ userId });
+    if (!cart) {
+      cart = new Cart({ userId, items: [] });
+    }
+
+    const existingIndex = cart.items.findIndex(i => i.itemId === itemId);
+    const qtyToAdd = Number(item.quantity) || 1;
+
+    if (existingIndex > -1) {
+      cart.items[existingIndex].quantity += qtyToAdd;
+    } else {
+      cart.items.push({
+        itemId,
+        productId: item.productId,
+        name: item.name || 'MatchA Product',
+        price: Number(item.price) || 0,
+        quantity: qtyToAdd,
+        image: item.image || '',
+        size: item.size || 'M',
+        color: item.color || 'Default',
+        colorHex: item.colorHex || ''
+      });
+    }
+
+    await cart.save();
+    res.json({ success: true, message: 'Item added to cart', data: cart });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to add item to cart', error: error.message });
+  }
+});
+
+// Update item quantity in cart (Task 8.6)
+app.put('/api/cart/:itemId', async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { userId = 'guest', quantity } = req.body;
+    const newQty = Number(quantity);
+
+    let cart = await Cart.findOne({ userId });
+    if (!cart) {
+      return res.status(404).json({ success: false, message: 'Cart not found' });
+    }
+
+    const itemIndex = cart.items.findIndex(i => i.itemId === itemId);
+    if (itemIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Item not found in cart' });
+    }
+
+    if (newQty <= 0) {
+      cart.items.splice(itemIndex, 1);
+    } else {
+      cart.items[itemIndex].quantity = newQty;
+    }
+
+    await cart.save();
+    res.json({ success: true, message: 'Cart updated successfully', data: cart });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to update cart', error: error.message });
+  }
+});
+
+// Delete item from cart (Task 8.7)
+app.delete('/api/cart/:itemId', async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { userId = 'guest' } = req.query;
+
+    let cart = await Cart.findOne({ userId });
+    if (!cart) {
+      return res.status(404).json({ success: false, message: 'Cart not found' });
+    }
+
+    cart.items = cart.items.filter(i => i.itemId !== itemId);
+    await cart.save();
+    res.json({ success: true, message: 'Item removed from cart', data: cart });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to delete item from cart', error: error.message });
+  }
+});
+
+// ==========================================
+// Order CRUD Endpoints (Task 8.5 / Order)
+// ==========================================
+
+// Create new order (Checkout)
+app.post('/api/orders', async (req, res) => {
+  try {
+    const {
+      customer,
+      items,
+      subtotal,
+      discount = 0,
+      shippingFee = 0,
+      total,
+      paymentMethod = 'visa',
+      shippingOption = 'standard'
+    } = req.body;
+
+    if (!items || !items.length) {
+      return res.status(400).json({ success: false, message: 'Order items are required' });
+    }
+
+    const newOrder = new Order({
+      customer: customer || {},
+      items,
+      subtotal: Number(subtotal) || 0,
+      discount: Number(discount) || 0,
+      shippingFee: Number(shippingFee) || 0,
+      total: Number(total) || 0,
+      paymentMethod,
+      shippingOption,
+      status: 'completed',
+      paymentStatus: 'paid'
+    });
+
+    const savedOrder = await newOrder.save();
+
+    // Reset guest cart after checkout
+    await Cart.findOneAndUpdate({ userId: 'guest' }, { items: [], totalAmount: 0 });
+
+    res.status(201).json({
+      success: true,
+      message: 'Order created successfully in MongoDB',
+      data: savedOrder
+    });
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ success: false, message: 'Failed to create order', error: error.message });
+  }
+});
+
+// List orders
+app.get('/api/orders', async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 }).limit(50);
+    res.json({ success: true, data: orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch orders', error: error.message });
+  }
+});
+
+// Get single order details
+app.get('/api/orders/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let order = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      order = await Order.findById(id);
+    }
+    if (!order) {
+      order = await Order.findOne({ orderId: id });
+    }
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    res.json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to retrieve order', error: error.message });
   }
 });
 
