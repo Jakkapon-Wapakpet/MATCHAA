@@ -1,13 +1,13 @@
 # 🍵 MatchA — Modern Japanese Artisan Streetwear & E-Commerce Platform
 
-[![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-18.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-5.1.4-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-4.18-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Express](https://img.shields.io/badge/Express-4.19.2-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 [![MongoDB Atlas](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/atlas)
-[![Mongoose](https://img.shields.io/badge/Mongoose-8.1-880000?style=for-the-badge&logo=mongoose&logoColor=white)](https://mongoosejs.com/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![E2E Verification](https://img.shields.io/badge/E2E_Tests-30%2F30_PASSED-brightgreen?style=for-the-badge)](./test_full_system.js)
+[![Mongoose](https://img.shields.io/badge/Mongoose-9.9.5-880000?style=for-the-badge&logo=mongoose&logoColor=white)](https://mongoosejs.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.3.3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![API Verification](https://img.shields.io/badge/API_Integration-30%2F30_PASSED-brightgreen?style=for-the-badge)](./test_full_system.js)
 
 > **Full-Stack Engineering Showcase & Developer Portfolio**  
 > A premium Japanese artisan streetwear platform combining real-time interactive styling experiences with an enterprise-grade Express.js and MongoDB Atlas REST data pipeline.
@@ -23,33 +23,33 @@
 | **Frontend Stack** | React 18, Vite 5, Tailwind CSS v4, Context API, Lenis Smooth Scroll |
 | **Backend Stack** | Node.js, Express.js, Mongoose ODM, MongoDB Atlas Cloud Database |
 | **Security & Auth** | Server-side bcrypt (10 rounds) + 7-Day JWT Bearer tokens + DB Role Guards |
-| **Quality Verification** | **30/30 Automated E2E Checks Passing** (`test_full_system.js`), 0 Build Errors |
+| **Quality Verification** | **30/30 Automated API & System Checks Passing** (`test_full_system.js`), 0 Build Errors |
 | **Documentation** | Complete Technical Specs and Proposals available in [`docs/`](./docs/) |
 
 ---
 
 ## 👨‍💻 My Engineering Contributions
 
-As a core developer on the MatchA platform, I spearheaded both foundational architecture and specialized user-experience systems:
+As a core team member on the MatchA platform, I contributed across full-stack architecture, database models, and test verification:
 
 1. **Full-Stack Architecture & API Integration:**
-   - Co-architected the decoupled 3-tier monorepo structure separating frontend client and Express REST API gateway.
+   - Collaborated on the decoupled 3-tier monorepo structure separating frontend client and Express REST API gateway.
    - Built the centralized API service layer ([`services/api.js`](./frontend/src/services/api.js)) featuring automatic Bearer JWT attachment and graceful offline fallback handling.
 
 2. **Database Modeling & Validation Guardrails:**
-   - Designed MongoDB schemas via Mongoose for **Products, Users, Carts, and Orders** ([`backend/models/`](./backend/models/)).
-   - Enforced strict server-level validation (positive pricing, minimum string constraints, enum category taxonomies).
+   - Worked on MongoDB schemas via Mongoose for **Products, Users, Carts, and Orders** ([`backend/models/`](./backend/models/)).
+   - Enforced server-level validation (positive pricing, minimum string constraints, enum category taxonomies).
 
 3. **Authentication & Role-Based Authorization:**
-   - Engineered server-enforced authentication pipeline with automatic bcrypt password hashing (`pre('save')` hooks) and JWT issuance.
-   - Implemented role-based route middleware ([`backend/middleware/auth.js`](./backend/middleware/auth.js)) querying fresh database records to prevent unauthorized product and member tampering.
+   - Co-developed server-enforced authentication pipeline with automatic bcrypt password hashing (`pre('save')` hooks) and JWT issuance.
+   - Assisted in configuring role-based route middleware ([`backend/middleware/auth.js`](./backend/middleware/auth.js)) querying fresh database records to prevent unauthorized product and member tampering.
 
 4. **Interactive Fashion Logic Engines:**
-   - **Personal Color Lab:** Implemented 4-season undertone matching algorithms recommending harmonious clothing collections based on color temperature.
-   - **Mix & Match Studio:** Developed real-time mathematical silhouette and contrast balance scoring across 4 wearable garment slots.
+   - **Personal Color Lab:** Contributed to 4-season undertone matching algorithms recommending harmonious clothing collections based on color temperature.
+   - **Mix & Match Studio:** Assisted in building real-time mathematical silhouette and contrast balance scoring across 4 wearable garment slots.
 
 5. **Automated Testing & Release Verification:**
-   - Authored and maintained the **30-test automated full-stack E2E audit suite** ([`test_full_system.js`](./test_full_system.js)), validating the entire pipeline from auth rejection to MongoDB persistence with 100% pass rate.
+   - Maintained and executed the **30-check automated full-stack API integration verification script** ([`test_full_system.js`](./test_full_system.js)), validating the entire pipeline from auth rejection to MongoDB persistence with 100% pass rate.
 
 ---
 
@@ -172,7 +172,7 @@ We prioritize strict server-side validation and pragmatic security hygiene:
 
 ## 🧪 Automated Verification Suite (30/30 Passed)
 
-The codebase includes an automated full-stack E2E audit suite ([`test_full_system.js`](./test_full_system.js)) that exercises the complete system against live MongoDB Atlas:
+The codebase includes an automated full-stack API integration and system verification suite ([`test_full_system.js`](./test_full_system.js)) that exercises the complete REST pipeline against live MongoDB Atlas:
 
 ```bash
 npm test
