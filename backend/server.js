@@ -45,6 +45,7 @@ app.get('/api/health', (req, res) => {
 const Product = require('./models/Product');
 const Cart = require('./models/Cart');
 const Order = require('./models/Order');
+const User = require('./models/User');
 const productsData = require('./data/products');
 
 // Sample Starter API endpoint
@@ -636,6 +637,148 @@ app.get('/api/orders/:id', async (req, res) => {
     res.json({ success: true, data: order });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to retrieve order', error: error.message });
+  }
+});
+
+// ==========================================
+// User & Member CRUD Endpoints (Task 10.7)
+// ==========================================
+
+// List all users / members
+app.get('/api/users', async (req, res) => {
+  try {
+    const { role, tier, search } = req.query;
+    const query = {};
+
+    if (role && role !== 'ALL') {
+      query.role = role;
+    }
+    if (tier && tier !== 'ALL') {
+      query.tier = tier;
+    }
+    if (search && search.trim()) {
+      const qRegex = { $regex: search.trim(), $options: 'i' };
+      query.$or = [
+        { name: qRegex },
+        { email: qRegex },
+        { userId: qRegex }
+      ];
+    }
+
+    const users = await User.find(query).sort({ createdAt: -1 });
+    res.json({ success: true, count: users.length, data: users });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch users', error: error.message });
+  }
+});
+
+// Get user by ID or email
+app.get('/api/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let user = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      user = await User.findById(id);
+    }
+    if (!user) {
+      user = await User.findOne({ $or: [{ userId: id }, { email: id }] });
+    }
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    res.json({ success: true, data: user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to retrieve user', error: error.message });
+  }
+});
+
+// Create new user / member
+app.post('/api/users', async (req, res) => {
+  try {
+    const { name, email, password, role, tier, phone, address } = req.body;
+
+    if (!name || !email) {
+      return res.status(400).json({ success: false, message: 'Name and email are required' });
+    }
+
+    const existing = await User.findOne({ email: email.toLowerCase() });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'Email is already registered' });
+    }
+
+    const newUser = new User({
+      name,
+      email: email.toLowerCase(),
+      password: password || '',
+      role: role || 'Member',
+      tier: tier || 'Regular Member',
+      phone: phone || '',
+      address: address || ''
+    });
+
+    const savedUser = await newUser.save();
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully in MongoDB',
+      data: savedUser
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ success: false, message: 'Failed to create user', error: error.message });
+  }
+});
+
+// Update user info or tier
+app.put('/api/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = { ...req.body };
+
+    let updated = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      updated = await User.findByIdAndUpdate(id, updateData, { returnDocument: 'after', runValidators: true });
+    }
+    if (!updated) {
+      updated = await User.findOneAndUpdate({ $or: [{ userId: id }, { email: id }] }, updateData, { returnDocument: 'after', runValidators: true });
+    }
+
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'User not found to update' });
+    }
+
+    res.json({
+      success: true,
+      message: 'User updated successfully in MongoDB',
+      data: updated
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to update user', error: error.message });
+  }
+});
+
+// Delete user
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let deleted = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      deleted = await User.findByIdAndDelete(id);
+    }
+    if (!deleted) {
+      deleted = await User.findOneAndDelete({ $or: [{ userId: id }, { email: id }] });
+    }
+
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'User not found to delete' });
+    }
+
+    res.json({
+      success: true,
+      message: 'User deleted successfully from MongoDB',
+      data: deleted
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to delete user', error: error.message });
   }
 });
 
