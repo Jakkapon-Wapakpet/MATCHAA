@@ -97,8 +97,7 @@ export default function ChooseYourFit({ onSelectFit }) {
           return (
             <div
               key={item.id}
-              data-home-reveal="card"
-              style={{ '--home-delay': `${(index % 2) * 80}ms` }}
+              style={{ '--enter-delay': `${(index % 2) * 80}ms` }}
               onMouseEnter={() => setHoveredCard(item.id)}
               onMouseLeave={() => setHoveredCard(null)}
               onClick={() => onSelectFit && onSelectFit(item)}

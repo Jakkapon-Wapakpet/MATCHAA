@@ -94,42 +94,17 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
   // Each slice model index (Initialized with a dynamic multi-color random mix)
   const [sliceModels, setSliceModels] = useState([0, 4, 2, 5]);
 
-  // Track auto-play running state for each of the 4 slices: [slice0, slice1, slice2, slice3]
-  // Auto-run on page load by default with 1.30s interval per user request
-  const [slicePlaying, setSlicePlaying] = useState([true, true, true, true]);
-
-  // Randomize all 4 slices independently across 10 outfits
-  const randomizeAll = () => {
-    setSliceModels([
-      Math.floor(Math.random() * models.length),
-      Math.floor(Math.random() * models.length),
-      Math.floor(Math.random() * models.length),
-      Math.floor(Math.random() * models.length)
-    ]);
-  };
-
-  // Auto-play interval effect for active running slices with randomized selection (1.30 seconds)
+  // Every slice reshuffles to a different look on its own, every 1.3 seconds.
   useEffect(() => {
-    const hasAnyPlaying = slicePlaying.some((p) => p);
-    if (!hasAnyPlaying) return;
-
     const interval = setInterval(() => {
-      setSliceModels((prev) => {
-        return prev.map((currentIdx, sliceIdx) => {
-          if (slicePlaying[sliceIdx]) {
-            let nextIdx = Math.floor(Math.random() * models.length);
-            if (nextIdx === currentIdx) {
-              nextIdx = (currentIdx + 1) % models.length;
-            }
-            return nextIdx;
-          }
-          return currentIdx;
-        });
-      });
+      setSliceModels((prev) => prev.map((currentIdx) => {
+        const nextIdx = Math.floor(Math.random() * models.length);
+        return nextIdx === currentIdx ? (currentIdx + 1) % models.length : nextIdx;
+      }));
     }, 1300);
 
     return () => clearInterval(interval);
-  }, [slicePlaying, models.length]);
+  }, [models.length]);
 
 
 

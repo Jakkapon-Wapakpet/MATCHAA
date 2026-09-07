@@ -1,6 +1,8 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import useChangeMotion from '../../hooks/useChangeMotion';
+import useScrollReveal from '../../hooks/useScrollReveal';
+import '../../styles/motion.css';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import ScrollProgressTracker from '../ui/ScrollProgressTracker';
@@ -17,6 +19,12 @@ export default function Layout({
 }) {
   const { pathname } = useLocation();
   const pageMotionRef = useChangeMotion(pathname, 'route');
+  const revealRef = useScrollReveal(pathname);
+  // One <main> drives both: the route fade and the scroll reveals below it.
+  const setMainRef = (node) => {
+    pageMotionRef.current = node;
+    revealRef.current = node;
+  };
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#2D231E] flex flex-col font-sans selection:bg-[#2D5A27] selection:text-white relative">
       
@@ -35,7 +43,7 @@ export default function Layout({
       />
 
       {/* Main Page Content */}
-      <main ref={pageMotionRef} className="flex-1 w-full">
+      <main ref={setMainRef} className="flex-1 w-full">
         {children}
       </main>
 

@@ -1,0 +1,36 @@
+/* Site-wide motion primitives.
+
+   [data-enter]  plays once as the element mounts — page arrival.
+   [data-reveal] plays once the first time the element scrolls into view.
+
+   Both stagger through --enter-delay and fall back to a plain fade when the
+   visitor asks for reduced motion. Neither hides anything: an element that
+   never receives its animation is simply visible, so a missing observer or an
+   unsupported browser costs nothing. */
+
+@keyframes enter-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes enter-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+[data-enter],
+[data-reveal].revealed {
+  animation: enter-rise 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+/* Direct-manipulation feedback: the control gives way under the press. Composes
+   with Tailwind's scale utilities, which set the `scale` property, not this
+   one. Kept under reduced motion — it answers the user's own finger. */
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-enter],
+  [data-reveal].revealed { animation-name: enter-fade; }
+}

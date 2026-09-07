@@ -257,12 +257,12 @@ export default function EditorialLookbookPage() {
               流行文化
             </span>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase text-[#2D231E] tracking-tight font-sans leading-[0.95] drop-shadow-xs">
+            <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase text-[#2D231E] tracking-tight font-sans leading-[0.95] drop-shadow-xs">
               Editorial <br />
               <span className="text-[#2D5A27] font-serif italic font-normal">Lookbook</span> Spread
             </h1>
 
-            <p className="mt-4 text-xs sm:text-sm text-[#6B5E55] font-sans max-w-2xl leading-relaxed">
+            <p data-enter style={{ '--enter-delay': '140ms' }} className="mt-4 text-xs sm:text-sm text-[#6B5E55] font-sans max-w-2xl leading-relaxed">
               ภาพถ่ายแฟชั่นชุดจริงระดับนิตยสาร ถ่ายทอดความงดงามของผ้ามัทฉะและซิลูเอทสตรีทแวร์ญี่ปุ่นในแสงธรรมชาติ พร้อมพิกัดเสื้อผ้าชิ้นจริงแบบอินเทอร์แอคทีฟ (Interactive Shoppable Hotspots)
             </p>
           </div>
@@ -678,8 +678,9 @@ export default function EditorialLookbookPage() {
             return (
               <article 
                 key={spread.id} 
-                style={{ animationDelay: `${index * 120}ms` }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center animate-editorial-reveal"
+                data-reveal="editorial"
+                style={{ '--enter-delay': `${(index % 2) * 120}ms` }}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
               >
                 
                 {/* Visual Image Column (Asymmetric Order Flip + 3D Tilt) */}

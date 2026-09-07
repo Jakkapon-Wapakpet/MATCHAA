@@ -157,10 +157,10 @@ export default function PaymentPage() {
         {/* Step Indicator Header */}
         <div className="mb-10 pb-6 border-b border-[#D9D3C7] flex items-center justify-between">
           <div>
-            <span className="text-xs font-mono font-bold text-[#2D5A27] uppercase tracking-widest">
+            <span data-enter className="text-xs font-mono font-bold text-[#2D5A27] uppercase tracking-widest">
               Checkout Flow
             </span>
-            <h1 className="text-2xl sm:text-4xl font-black uppercase text-[#2D231E] tracking-tight mt-1">
+            <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-2xl sm:text-4xl font-black uppercase text-[#2D231E] tracking-tight mt-1">
               {step === 'shipping' ? 'Shipping Details' : 'Payment Method'}
             </h1>
           </div>

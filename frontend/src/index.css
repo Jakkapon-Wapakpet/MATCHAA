@@ -327,8 +327,15 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-.animate-editorial-reveal {
+.animate-editorial-reveal,
+[data-reveal="editorial"].revealed {
   animation: editorialSlideIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-editorial-reveal,
+  [data-reveal="editorial"].revealed { animation-name: enter-fade; }
 }
 
 @keyframes glowMatcha {

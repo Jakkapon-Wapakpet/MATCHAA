@@ -207,14 +207,14 @@ export default function MixMatchStudioPage() {
         {/* 1. HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#D9D3C7]">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E2ECE9] border border-[#2D5A27]/20 text-[#2D5A27] text-xs font-mono font-bold uppercase tracking-wider mb-2">
+            <div data-enter className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E2ECE9] border border-[#2D5A27]/20 text-[#2D5A27] text-xs font-mono font-bold uppercase tracking-wider mb-2">
               <Sparkles size={14} />
               <span>Head-to-Toe 4-Slot Wardrobe Canvas</span>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight font-serif">
+            <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight font-serif">
               Mix & Match Fashion Studio
             </h1>
-            <p className="text-[#6B5E55] text-xs sm:text-sm mt-1">
+            <p data-enter style={{ '--enter-delay': '140ms' }} className="text-[#6B5E55] text-xs sm:text-sm mt-1">
               จับคู่ลุคสมบูรณ์แบบ เสื้อ • กางเกง • รองเท้า • เครื่องประดับ พร้อมระบบคำนวณ Color Harmony ตามทฤษฎีสากล
             </p>
           </div>

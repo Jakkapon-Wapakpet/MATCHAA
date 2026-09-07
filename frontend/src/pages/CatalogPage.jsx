@@ -168,17 +168,17 @@ export default function CatalogPage({
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 pb-6 border-b border-[#D9D3C7]">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#2D5A27] uppercase tracking-widest mb-1.5">
+            <div data-enter className="flex items-center gap-2 text-xs font-mono font-bold text-[#2D5A27] uppercase tracking-widest mb-1.5">
               <span>MatchA Catalog Archive</span>
               <span>✦</span>
               <span>2026 Collection</span>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight">
+            <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight">
               Artisan Apparel
             </h1>
           </div>
 
-          <div className="text-xs font-mono text-[#6B5E55]">
+          <div data-enter style={{ '--enter-delay': '140ms' }} className="text-xs font-mono text-[#6B5E55]">
             Total <strong className="text-[#2D231E]">{totalItems}</strong> pieces available
           </div>
         </div>
