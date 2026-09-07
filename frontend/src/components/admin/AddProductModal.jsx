@@ -193,7 +193,7 @@ export default function AddProductModal({ isOpen, onClose, onAddProduct }) {
                 Price (USD) <span className="text-[#BC5A36]">*</span>
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B5E55] font-bold">$</span>
+                <span className="absolute left-3.5 inset-y-0 my-auto h-fit text-[#6B5E55] font-bold">$</span>
                 <input
                   type="number"
                   step="0.01"

@@ -653,7 +653,7 @@ export default function AdminPage() {
             
             {/* Global Search Input */}
             <div className="relative flex-1 sm:w-64">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B5E55]" />
+              <Search size={14} className="absolute left-3 inset-y-0 my-auto text-[#6B5E55]" />
               <input
                 type="text"
                 value={globalSearch}
@@ -664,7 +664,7 @@ export default function AdminPage() {
               {globalSearch && (
                 <button
                   onClick={() => setGlobalSearch('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[#BC5A36] hover:font-bold cursor-pointer"
+                  className="absolute right-2.5 inset-y-0 my-auto h-fit text-xs text-[#BC5A36] hover:font-bold cursor-pointer"
                 >
                   ✕
                 </button>
