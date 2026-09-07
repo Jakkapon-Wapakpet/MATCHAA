@@ -1,7 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
+import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 
 export default function BrandHero({ onShopNow, onEnterWebsite }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const sectionRef = useRef(null);
+  const [stickyOffset, setStickyOffset] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // Pin the masthead and scale it down as the hero scrolls away. Lenis smooth
+  // scroll swallows almost every native scroll event (one per gesture), so the
+  // position is sampled each frame instead; React bails out when it is unchanged.
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setStickyOffset(0);
+      setScrollProgress(0);
+      return;
+    }
+    let frame = 0;
+    const measure = () => {
+      frame = requestAnimationFrame(measure);
+      const section = sectionRef.current;
+      if (!section) return;
+      const rect = section.getBoundingClientRect();
+      const maxShift = section.offsetHeight - window.innerHeight;
+
+      if (rect.top <= 0 && rect.bottom >= 150 && maxShift > 0) {
+        setStickyOffset(Math.min(Math.max(-rect.top, 0), maxShift));
+        setScrollProgress(Math.min(Math.max(-rect.top / maxShift, 0), 1));
+      } else if (rect.top > 0) {
+        setStickyOffset(0);
+        setScrollProgress(0);
+      }
+    };
+    frame = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(frame);
+  }, [prefersReducedMotion]);
+
   // Studio model references for the four independently shuffled slices.
   const models = [
     {
@@ -134,14 +169,24 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
     }
   };
 
+  // Full size at the top, easing down to 0.65x as the hero scrolls away.
+  const titleScale = Math.max(1 - scrollProgress * 0.35, 0.65);
+  const titleOpacity = Math.max(1 - scrollProgress * 0.2, 0.8);
+
   return (
     <section
+      ref={sectionRef}
       className="relative w-full bg-[#FAF8F5] text-[#2D231E] min-h-[145vh] pt-2 pb-12 px-4 sm:px-8 lg:px-12 flex flex-col justify-between select-none border-b border-[#D9D3C7]"
     >
       
-      {/* The masthead reveals once and then follows normal document scrolling. */}
-      <div 
+      {/* The masthead reveals once, then pins and scales down as the page scrolls. */}
+      <div
         className="w-full text-center z-0 pointer-events-none select-none pt-1 sm:pt-3 -mb-4 sm:-mb-6 md:-mb-8 relative origin-top home-masthead"
+        style={{
+          transform: `translateY(${stickyOffset}px) scale(${titleScale})`,
+          opacity: titleOpacity,
+          transition: 'transform 0.04s ease-out, opacity 0.04s ease-out',
+        }}
       >
         <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10.5rem] font-black tracking-tight uppercase leading-none inline-block whitespace-nowrap drop-shadow-sm font-sans home-masthead-title">
           <span className="text-[#2D5A27]">MATCH</span>
