@@ -19,15 +19,15 @@ export default function CartPage({ cartItems = [], onUpdateQty, onRemove, onBack
         <div data-enter className="w-24 h-24 mx-auto rounded-3xl bg-[#D0DEC6]/60 border border-[#B8CBAE] flex items-center justify-center text-5xl shadow-md">
           🛒
         </div>
-        <h1 data-enter style={{ '--enter-delay': '70ms' }} className="mt-8 text-3xl sm:text-4xl font-extrabold tracking-tight text-[#2D231E]">
+        <h1 data-enter="wipe" style={{ '--enter-delay': '90ms' }} className="mt-8 text-3xl sm:text-4xl font-extrabold tracking-tight text-[#2D231E]">
           Your cart is empty
         </h1>
-        <p data-enter style={{ '--enter-delay': '140ms' }} className="mt-3 text-sm font-mono text-[#6B5E55]">
+        <p data-enter style={{ '--enter-delay': '190ms' }} className="mt-3 text-sm font-mono text-[#6B5E55]">
           Looks like you haven't dropped anything in yet.
         </p>
         <button
           onClick={onBackToStore}
-          data-enter style={{ '--enter-delay': '210ms' }}
+          data-enter style={{ '--enter-delay': '290ms' }}
           className="mt-8 inline-flex items-center gap-2 px-6 py-3.5 bg-[#2D5A27] hover:bg-[#23471E] text-white text-xs font-bold uppercase tracking-widest rounded-xl shadow-md transition-all active:scale-95 cursor-pointer"
         >
           <ArrowLeft size={14} />
@@ -45,11 +45,11 @@ export default function CartPage({ cartItems = [], onUpdateQty, onRemove, onBack
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-10">
           <div>
             <span data-enter className="text-xs uppercase tracking-widest text-[#2D5A27] font-bold font-mono">Your Selection</span>
-            <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-3xl sm:text-5xl font-extrabold text-[#2D231E] tracking-tight mt-1">
+            <h1 data-enter="wipe" style={{ '--enter-delay': '90ms' }} className="text-3xl sm:text-5xl font-extrabold text-[#2D231E] tracking-tight mt-1">
               Shopping cart
             </h1>
           </div>
-          <p data-enter style={{ '--enter-delay': '140ms' }} className="text-xs text-[#6B5E55] font-mono">
+          <p data-enter style={{ '--enter-delay': '190ms' }} className="text-xs text-[#6B5E55] font-mono">
             {cartItems.length} {cartItems.length === 1 ? 'style' : 'styles'} in your bag
           </p>
         </div>

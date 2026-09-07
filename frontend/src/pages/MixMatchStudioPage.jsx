@@ -211,10 +211,10 @@ export default function MixMatchStudioPage() {
               <Sparkles size={14} />
               <span>Head-to-Toe 4-Slot Wardrobe Canvas</span>
             </div>
-            <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight font-serif">
+            <h1 data-enter="wipe" style={{ '--enter-delay': '90ms' }} className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight font-serif">
               Mix & Match Fashion Studio
             </h1>
-            <p data-enter style={{ '--enter-delay': '140ms' }} className="text-[#6B5E55] text-xs sm:text-sm mt-1">
+            <p data-enter style={{ '--enter-delay': '190ms' }} className="text-[#6B5E55] text-xs sm:text-sm mt-1">
               จับคู่ลุคสมบูรณ์แบบ เสื้อ • กางเกง • รองเท้า • เครื่องประดับ พร้อมระบบคำนวณ Color Harmony ตามทฤษฎีสากล
             </p>
           </div>

@@ -160,7 +160,7 @@ export default function PaymentPage() {
             <span data-enter className="text-xs font-mono font-bold text-[#2D5A27] uppercase tracking-widest">
               Checkout Flow
             </span>
-            <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-2xl sm:text-4xl font-black uppercase text-[#2D231E] tracking-tight mt-1">
+            <h1 data-enter="wipe" style={{ '--enter-delay': '90ms' }} className="text-2xl sm:text-4xl font-black uppercase text-[#2D231E] tracking-tight mt-1">
               {step === 'shipping' ? 'Shipping Details' : 'Payment Method'}
             </h1>
           </div>

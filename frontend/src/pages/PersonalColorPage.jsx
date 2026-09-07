@@ -237,10 +237,10 @@ export default function PersonalColorPage() {
             <Sparkles size={14} />
             <span>Artisan Personal Color Lab & Styling Science</span>
           </div>
-          <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight font-serif">
+          <h1 data-enter="wipe" style={{ '--enter-delay': '90ms' }} className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight font-serif">
             ค้นหาโทนสีผิวประจำตัว 4 ฤดูกาล
           </h1>
-          <p data-enter style={{ '--enter-delay': '140ms' }} className="text-[#6B5E55] text-sm sm:text-base leading-relaxed">
+          <p data-enter style={{ '--enter-delay': '190ms' }} className="text-[#6B5E55] text-sm sm:text-base leading-relaxed">
             เลือกใส่เสื้อผ้าที่ขับออร่าของคุณด้วย <strong>ทฤษฎี Personal Color สากล</strong> จำแนกตาม 4 ฤดู ช่วยให้ทุกชุดที่คุณสวมใส่เสริมบุคลิกและสะท้อนเสน่ห์ที่เป็นเอกลักษณ์
           </p>
 

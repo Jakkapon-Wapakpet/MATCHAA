@@ -173,12 +173,12 @@ export default function CatalogPage({
               <span>✦</span>
               <span>2026 Collection</span>
             </div>
-            <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight">
+            <h1 data-enter="wipe" style={{ '--enter-delay': '90ms' }} className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight">
               Artisan Apparel
             </h1>
           </div>
 
-          <div data-enter style={{ '--enter-delay': '140ms' }} className="text-xs font-mono text-[#6B5E55]">
+          <div data-enter style={{ '--enter-delay': '190ms' }} className="text-xs font-mono text-[#6B5E55]">
             Total <strong className="text-[#2D231E]">{totalItems}</strong> pieces available
           </div>
         </div>

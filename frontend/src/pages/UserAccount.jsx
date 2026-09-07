@@ -150,7 +150,7 @@ export default function UserAccount() {
               You have been successfully logged out of MatchA.
             </p>
           </div>
-          <div data-enter style={{ '--enter-delay': '140ms' }} className="flex flex-col sm:flex-row gap-3">
+          <div data-enter style={{ '--enter-delay': '190ms' }} className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => navigate('/login')}
               className="flex-1 py-3 bg-[#2D5A27] text-white text-xs font-bold font-mono uppercase rounded-xl shadow-md hover:bg-[#23471E] transition-all cursor-pointer"
@@ -207,13 +207,13 @@ export default function UserAccount() {
               <Sparkles size={14} />
               <span>MatchA Collector Lounge</span>
             </div>
-            <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-3xl sm:text-4xl font-black uppercase text-[#2D231E] tracking-tight">
+            <h1 data-enter="wipe" style={{ '--enter-delay': '90ms' }} className="text-3xl sm:text-4xl font-black uppercase text-[#2D231E] tracking-tight">
               Member Account
             </h1>
           </div>
 
           {/* VIP Badge */}
-          <div data-enter style={{ '--enter-delay': '140ms' }} className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#D0DEC6] text-[#2D5A27] font-mono text-xs font-bold shadow-2xs">
+          <div data-enter style={{ '--enter-delay': '190ms' }} className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#D0DEC6] text-[#2D5A27] font-mono text-xs font-bold shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-[#2D5A27] animate-pulse" />
             <span>
               {currentUser?.role === 'Admin' ? '👑 STORE ADMINISTRATOR' : '🟢 MATCHA CONNOISSEUR (VIP)'}

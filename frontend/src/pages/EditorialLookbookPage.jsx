@@ -257,12 +257,12 @@ export default function EditorialLookbookPage() {
               流行文化
             </span>
 
-            <h1 data-enter style={{ '--enter-delay': '70ms' }} className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase text-[#2D231E] tracking-tight font-sans leading-[0.95] drop-shadow-xs">
+            <h1 data-enter="wipe" style={{ '--enter-delay': '90ms' }} className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase text-[#2D231E] tracking-tight font-sans leading-[0.95] drop-shadow-xs">
               Editorial <br />
               <span className="text-[#2D5A27] font-serif italic font-normal">Lookbook</span> Spread
             </h1>
 
-            <p data-enter style={{ '--enter-delay': '140ms' }} className="mt-4 text-xs sm:text-sm text-[#6B5E55] font-sans max-w-2xl leading-relaxed">
+            <p data-enter style={{ '--enter-delay': '190ms' }} className="mt-4 text-xs sm:text-sm text-[#6B5E55] font-sans max-w-2xl leading-relaxed">
               ภาพถ่ายแฟชั่นชุดจริงระดับนิตยสาร ถ่ายทอดความงดงามของผ้ามัทฉะและซิลูเอทสตรีทแวร์ญี่ปุ่นในแสงธรรมชาติ พร้อมพิกัดเสื้อผ้าชิ้นจริงแบบอินเทอร์แอคทีฟ (Interactive Shoppable Hotspots)
             </p>
           </div>
@@ -748,7 +748,13 @@ export default function EditorialLookbookPage() {
                 </div>
 
                 {/* Editorial Text & Shoppable Product Card Column */}
-                <div className={`lg:col-span-5 space-y-6 ${isEven ? 'lg:order-2' : 'lg:order-1'}`}>
+                {/* Drifts against the photograph as the spread passes, the way a
+                    magazine gutter reads when you turn the page slowly. */}
+                <div
+                  data-drift
+                  style={{ '--drift-from': '52px', '--drift-to': '-52px' }}
+                  className={`lg:col-span-5 space-y-6 ${isEven ? 'lg:order-2' : 'lg:order-1'}`}
+                >
                   
                   <div className="space-y-2">
                     <span className="text-xs font-mono font-bold text-[#BC5A36] uppercase tracking-widest block">
