@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shuffle, Play, Pause, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export default function BrandHero({ onShopNow, onEnterWebsite }) {
   const sectionRef = useRef(null);
@@ -131,21 +131,7 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
     return () => clearInterval(interval);
   }, [slicePlaying, models.length]);
 
-  // Toggle play/stop on a specific slice
-  const togglePlaySlice = (sliceIndex, e) => {
-    e?.stopPropagation();
-    setSlicePlaying((prev) => {
-      const next = [...prev];
-      next[sliceIndex] = !next[sliceIndex];
-      return next;
-    });
-  };
 
-  // Toggle master play/pause for all 4 slices together
-  const togglePlayAll = () => {
-    const allPlaying = slicePlaying.every((p) => p);
-    setSlicePlaying([!allPlaying, !allPlaying, !allPlaying, !allPlaying]);
-  };
 
   // Click on a single slice to cycle to a random new look
   const cycleSingleSlice = (sliceIndex) => {
@@ -174,7 +160,6 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
     '☺'
   ];
 
-  const isAllPlaying = slicePlaying.every((p) => p);
 
   const handleAction = () => {
     if (onEnterWebsite) {
@@ -244,19 +229,6 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
                 alt="MatchA Head Slice" 
                 className="absolute inset-x-0 w-full h-[400%] top-0 object-cover object-center pointer-events-none transition-all duration-500 group-hover:scale-102"
               />
-              {/* Slice 1 Play / Stop Button */}
-              <button 
-                onClick={(e) => togglePlaySlice(0, e)}
-                title={slicePlaying[0] ? 'Stop Randomizing Slice 1' : 'Auto-Randomize Slice 1'}
-                aria-label="Toggle Slice 1 Auto-run"
-                className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold shadow-md transition-all z-20 cursor-pointer ${
-                  slicePlaying[0]
-                    ? 'bg-[#BC5A36] text-white border-[#A64C2B] animate-pulse ring-2 ring-[#BC5A36]/40'
-                    : 'bg-white/90 text-[#2D231E] border-[#D9D3C7] hover:bg-[#BC5A36] hover:text-white'
-                }`}
-              >
-                {slicePlaying[0] ? '⏸' : '▷'}
-              </button>
             </div>
 
             {/* Slice 2: Torso & Apparel (25% - 50%) */}
@@ -270,19 +242,6 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
                 alt="MatchA Torso Slice" 
                 className="absolute inset-x-0 w-full h-[400%] -top-full object-cover object-center pointer-events-none transition-all duration-500 group-hover:scale-102"
               />
-              {/* Slice 2 Play / Stop Button */}
-              <button 
-                onClick={(e) => togglePlaySlice(1, e)}
-                title={slicePlaying[1] ? 'Stop Randomizing Slice 2' : 'Auto-Randomize Slice 2'}
-                aria-label="Toggle Slice 2 Auto-run"
-                className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold shadow-md transition-all z-20 cursor-pointer ${
-                  slicePlaying[1]
-                    ? 'bg-[#BC5A36] text-white border-[#A64C2B] animate-pulse ring-2 ring-[#BC5A36]/40'
-                    : 'bg-white/90 text-[#2D231E] border-[#D9D3C7] hover:bg-[#BC5A36] hover:text-white'
-                }`}
-              >
-                {slicePlaying[1] ? '⏸' : '▷'}
-              </button>
             </div>
 
             {/* Slice 3: Lower Body & Pants/Skirt (50% - 75%) */}
@@ -296,19 +255,6 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
                 alt="MatchA Pants/Skirt Slice" 
                 className="absolute inset-x-0 w-full h-[400%] top-[-200%] object-cover object-center pointer-events-none transition-all duration-500 group-hover:scale-102"
               />
-              {/* Slice 3 Play / Stop Button */}
-              <button 
-                onClick={(e) => togglePlaySlice(2, e)}
-                title={slicePlaying[2] ? 'Stop Randomizing Slice 3' : 'Auto-Randomize Slice 3'}
-                aria-label="Toggle Slice 3 Auto-run"
-                className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold shadow-md transition-all z-20 cursor-pointer ${
-                  slicePlaying[2]
-                    ? 'bg-[#BC5A36] text-white border-[#A64C2B] animate-pulse ring-2 ring-[#BC5A36]/40'
-                    : 'bg-white/90 text-[#2D231E] border-[#D9D3C7] hover:bg-[#BC5A36] hover:text-white'
-                }`}
-              >
-                {slicePlaying[2] ? '⏸' : '▷'}
-              </button>
             </div>
 
             {/* Slice 4: Sneakers & Studio Floor (75% - 100%) */}
@@ -322,19 +268,6 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
                 alt="MatchA Footwear Slice" 
                 className="absolute inset-x-0 w-full h-[400%] top-[-300%] object-cover object-center pointer-events-none transition-all duration-500 group-hover:scale-102"
               />
-              {/* Slice 4 Play / Stop Button */}
-              <button 
-                onClick={(e) => togglePlaySlice(3, e)}
-                title={slicePlaying[3] ? 'Stop Randomizing Slice 4' : 'Auto-Randomize Slice 4'}
-                aria-label="Toggle Slice 4 Auto-run"
-                className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold shadow-md transition-all z-20 cursor-pointer ${
-                  slicePlaying[3]
-                    ? 'bg-[#BC5A36] text-white border-[#A64C2B] animate-pulse ring-2 ring-[#BC5A36]/40'
-                    : 'bg-white/90 text-[#2D231E] border-[#D9D3C7] hover:bg-[#BC5A36] hover:text-white'
-                }`}
-              >
-                {slicePlaying[3] ? '⏸' : '▷'}
-              </button>
             </div>
 
           </div>
