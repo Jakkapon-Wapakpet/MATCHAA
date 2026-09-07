@@ -1,5 +1,11 @@
+require('dotenv').config();
+const dns = require('dns');
+// แก้ปัญหา Windows / Node.js c-ares DNS SRV lookup ขัดข้องกับ MongoDB Atlas
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -194,6 +200,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: 'Internal Server Error', error: err.message });
 });
 
+// ทดสอบเชื่อมต่อแบบ Non-blocking (ไม่ทำให้เซิร์ฟเวอร์ค้างถ้าต่อไม่ติด)
+if (process.env.MONGODB_URI) {
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('🍃 [MongoDB] Connected successfully!'))
+    .catch(err => console.error('❌ [MongoDB] Connection error:', err.message));
+}
+
 app.listen(PORT, () => {
   console.log(`🚀 Backend Server running on http://localhost:${PORT}`);
 });
+
+
