@@ -44,32 +44,33 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import AddProductModal from '../components/admin/AddProductModal';
+import { api } from '../services/api';
 
 const INITIAL_INVENTORY = [
   {
     id: 'SKU-001',
-    name: 'MatchA Heavyweight Boxy Tee',
+    name: 'MatchA Heavyweight Boxy Shirt',
     category: 'Tops',
     price: 48,
     stock: 45,
     status: 'In Stock',
-    color: 'Matcha Green',
+    color: 'Warm Brown',
     fit: 'Boxy Oversized',
-    season: 'SS26',
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+    season: 'Autumn',
+    image: '/images/products/autumn/tops/shirts/color_1_brown.jpeg',
     createdAt: '2026-01-15'
   },
   {
     id: 'SKU-002',
-    name: 'MatchA Pleated Relaxed Trousers',
+    name: 'MatchA Pleated Relaxed Chinos',
     category: 'Bottoms',
     price: 88,
     stock: 12,
     status: 'Low Stock',
-    color: 'Charcoal Black',
+    color: 'Olive Green',
     fit: 'Relaxed Tailored',
-    season: 'SS26',
-    image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
+    season: 'Autumn',
+    image: '/images/products/autumn/bottoms/chinos/color_1_olive.jpeg',
     createdAt: '2026-02-10'
   },
   {
@@ -79,75 +80,75 @@ const INITIAL_INVENTORY = [
     price: 110,
     stock: 24,
     status: 'In Stock',
-    color: 'Washed Olive',
+    color: 'Burnt Orange',
     fit: 'Boxy Oversized',
-    season: 'FW26',
-    image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
+    season: 'Autumn',
+    image: '/images/products/autumn/tops/hoodies/color_1_burnt_orange.jpeg',
     createdAt: '2026-03-01'
   },
   {
     id: 'SKU-004',
-    name: 'MatchA Ceramic Matcha Bowl (Artisan)',
+    name: 'MatchA Autumn Leather Utility Bag',
     category: 'Accessories',
-    price: 34,
+    price: 44,
     stock: 6,
     status: 'Low Stock',
-    color: 'Glazed Earth',
+    color: 'Burnt Orange',
     fit: 'Standard Fit',
-    season: 'Core',
-    image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=800&q=80',
+    season: 'Autumn',
+    image: '/images/products/autumn/accessories/bags/color_1_burnt_orange.jpeg',
     createdAt: '2026-03-20'
   },
   {
     id: 'SKU-005',
-    name: 'MatchA Corduroy Bucket Hat',
+    name: 'MatchA Artisan Silk Scarf',
     category: 'Accessories',
     price: 38,
     stock: 0,
     status: 'Out of Stock',
-    color: 'Clay Tan',
+    color: 'Burnt Orange',
     fit: 'Standard Fit',
-    season: 'SS26',
-    image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=800&q=80',
+    season: 'Autumn',
+    image: '/images/products/autumn/accessories/scarves/color_1_burnt_orange.jpeg',
     createdAt: '2026-04-05'
   },
   {
     id: 'SKU-006',
-    name: 'MatchA Kimono Wrap Cardigan',
+    name: 'MatchA Heritage Work Jacket',
     category: 'Outerwear',
     price: 125,
     stock: 19,
     status: 'In Stock',
-    color: 'Deep Forest',
+    color: 'Earth Brown',
     fit: 'Relaxed Tailored',
-    season: 'FW26',
-    image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=800&q=80',
+    season: 'Autumn',
+    image: '/images/products/autumn/tops/jackets/color_1_brown.jpeg',
     createdAt: '2026-04-18'
   },
   {
     id: 'SKU-007',
-    name: 'MatchA Relaxed Linen Overshirt',
+    name: 'MatchA Textured Knit Sweater',
     category: 'Tops',
     price: 74,
     stock: 31,
     status: 'In Stock',
-    color: 'Soft Sage',
+    color: 'Burnt Orange',
     fit: 'Relaxed Tailored',
-    season: 'SS26',
-    image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80',
+    season: 'Autumn',
+    image: '/images/products/autumn/tops/sweaters/color_1_burnt_orange.jpeg',
     createdAt: '2026-05-12'
   },
   {
     id: 'SKU-008',
-    name: 'MatchA Wide-Leg Canvas Workpants',
+    name: 'MatchA Relaxed Classic Jeans',
     category: 'Bottoms',
     price: 92,
     stock: 4,
     status: 'Low Stock',
-    color: 'Warm Khaki',
+    color: 'Earth Brown',
     fit: 'Wide Leg',
-    season: 'FW26',
-    image: 'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=800&q=80',
+    season: 'Autumn',
+    image: '/images/products/autumn/bottoms/jeans/color_1_brown.jpeg',
     createdAt: '2026-06-04'
   }
 ];
@@ -192,10 +193,39 @@ export default function AdminPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
 
-  // Core Data States with localStorage persistence
+  // Core Data States with localStorage persistence & automatic sanitization of legacy images
   const [inventory, setInventory] = useState(() => {
     const saved = localStorage.getItem('matcha_admin_inventory');
-    return saved ? JSON.parse(saved) : INITIAL_INVENTORY;
+    const validImages = [
+      '/images/products/autumn/tops/shirts/color_1_brown.jpeg',
+      '/images/products/autumn/bottoms/chinos/color_1_olive.jpeg',
+      '/images/products/autumn/tops/hoodies/color_1_burnt_orange.jpeg',
+      '/images/products/autumn/accessories/bags/color_1_burnt_orange.jpeg',
+      '/images/products/autumn/accessories/scarves/color_1_burnt_orange.jpeg',
+      '/images/products/autumn/tops/jackets/color_1_brown.jpeg',
+      '/images/products/autumn/tops/sweaters/color_1_burnt_orange.jpeg',
+      '/images/products/autumn/bottoms/jeans/color_1_brown.jpeg'
+    ];
+
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.map((item, idx) => {
+          if (
+            !item.image ||
+            item.image.includes('unsplash.com') ||
+            item.image.includes('knit-sweaters') ||
+            item.image.includes('spring/')
+          ) {
+            return { ...item, image: validImages[idx % validImages.length] };
+          }
+          return item;
+        });
+      } catch (err) {
+        return INITIAL_INVENTORY;
+      }
+    }
+    return INITIAL_INVENTORY;
   });
 
   const [orders, setOrders] = useState(() => {
@@ -214,6 +244,73 @@ export default function AdminPage() {
   const [inventoryStatusFilter, setInventoryStatusFilter] = useState('ALL');
   const [orderStatusFilter, setOrderStatusFilter] = useState('ALL');
   const [memberTierFilter, setMemberTierFilter] = useState('ALL');
+
+  // Sanitize on mount in case localStorage already has broken image paths
+  useEffect(() => {
+    const validImages = [
+      '/images/products/autumn/tops/shirts/color_1_brown.jpeg',
+      '/images/products/autumn/bottoms/chinos/color_1_olive.jpeg',
+      '/images/products/autumn/tops/hoodies/color_1_burnt_orange.jpeg',
+      '/images/products/autumn/accessories/bags/color_1_burnt_orange.jpeg',
+      '/images/products/autumn/accessories/scarves/color_1_burnt_orange.jpeg',
+      '/images/products/autumn/tops/jackets/color_1_brown.jpeg',
+      '/images/products/autumn/tops/sweaters/color_1_burnt_orange.jpeg',
+      '/images/products/autumn/bottoms/jeans/color_1_brown.jpeg'
+    ];
+    setInventory((prev) =>
+      prev.map((item, idx) => {
+        if (
+          !item.image ||
+          item.image.includes('unsplash.com') ||
+          item.image.includes('knit-sweaters') ||
+          item.image.includes('spring/')
+        ) {
+          return { ...item, image: validImages[idx % validImages.length] };
+        }
+        return item;
+      })
+    );
+
+    // Fetch real inventory and orders from MongoDB Atlas Backend
+    let isMounted = true;
+    async function loadBackendData() {
+      try {
+        const prodRes = await api.getProducts({ limit: 100 });
+        if (isMounted && prodRes && prodRes.data && prodRes.data.length > 0) {
+          const normalized = prodRes.data.map(p => ({
+            ...p,
+            id: p.id || p._id,
+            stock: typeof p.quantity === 'number' ? p.quantity : (typeof p.stock === 'number' ? p.stock : 20),
+            status: (p.quantity > 0 || p.stock > 0) ? ((p.quantity || p.stock) <= 10 ? 'Low Stock' : 'In Stock') : 'Out of Stock'
+          }));
+          setInventory(normalized);
+        }
+      } catch (err) {
+        console.warn('Backend inventory fetch fallback:', err.message);
+      }
+
+      try {
+        const orderRes = await api.getOrders();
+        if (isMounted && orderRes && orderRes.data && orderRes.data.length > 0) {
+          const normalizedOrders = orderRes.data.map(o => ({
+            id: o.orderId || o._id,
+            customer: `${o.customer?.firstName || 'Guest'} ${o.customer?.lastName || ''}`.trim(),
+            email: o.customer?.email || 'N/A',
+            items: o.items?.length || 0,
+            total: o.total || 0,
+            status: o.status ? o.status.charAt(0).toUpperCase() + o.status.slice(1) : 'Processing',
+            date: o.createdAt ? o.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]
+          }));
+          setOrders(normalizedOrders);
+        }
+      } catch (err) {
+        console.warn('Backend orders fetch fallback:', err.message);
+      }
+    }
+
+    loadBackendData();
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('matcha_admin_inventory', JSON.stringify(inventory));
@@ -284,29 +381,60 @@ export default function AdminPage() {
   }, [members, globalSearch, memberTierFilter]);
 
   // Inventory Actions
-  const handleAddProduct = (newProduct) => {
-    setInventory(prev => [newProduct, ...prev]);
-    showToast(`Garment "${newProduct.name}" created successfully!`, 'success');
+  const handleAddProduct = async (newProduct) => {
+    try {
+      const res = await api.createProduct({
+        ...newProduct,
+        quantity: Number(newProduct.stock) || 20,
+        price: Number(newProduct.price) || 0
+      });
+      const savedItem = res?.data || newProduct;
+      const normalizedItem = {
+        ...savedItem,
+        id: savedItem.id || savedItem._id || newProduct.id,
+        stock: typeof savedItem.quantity === 'number' ? savedItem.quantity : Number(newProduct.stock),
+        status: Number(newProduct.stock) > 0 ? (Number(newProduct.stock) <= 10 ? 'Low Stock' : 'In Stock') : 'Out of Stock'
+      };
+      setInventory(prev => [normalizedItem, ...prev]);
+      showToast(`Garment "${newProduct.name}" created and saved to MongoDB!`, 'success');
+    } catch (err) {
+      console.error('Failed to create product via API:', err);
+      setInventory(prev => [newProduct, ...prev]);
+      showToast(`Saved locally: ${err.message}`, 'warning');
+    }
   };
 
-  const handleRestock = (id, amount) => {
-    setInventory(prev => prev.map(item => {
-      if (item.id === id) {
-        const newStock = Math.max(0, item.stock + amount);
-        let newStatus = 'In Stock';
-        if (newStock === 0) newStatus = 'Out of Stock';
-        else if (newStock <= 10) newStatus = 'Low Stock';
-        return { ...item, stock: newStock, status: newStatus };
-      }
-      return item;
-    }));
-    showToast(`Stock updated (${amount > 0 ? `+${amount}` : amount})`, 'info');
+  const handleRestock = async (id, amount) => {
+    const item = inventory.find(i => i.id === id);
+    if (!item) return;
+
+    const newStock = Math.max(0, item.stock + amount);
+    let newStatus = 'In Stock';
+    if (newStock === 0) newStatus = 'Out of Stock';
+    else if (newStock <= 10) newStatus = 'Low Stock';
+
+    setInventory(prev => prev.map(i => i.id === id ? { ...i, stock: newStock, status: newStatus } : i));
+
+    try {
+      await api.updateProduct(id, { quantity: newStock, stock: newStock });
+      showToast(`Stock updated in MongoDB (${amount > 0 ? `+${amount}` : amount})`, 'success');
+    } catch (err) {
+      console.warn('Failed to update stock via API, kept optimistic update:', err.message);
+      showToast(`Stock updated locally (${amount > 0 ? `+${amount}` : amount})`, 'info');
+    }
   };
 
-  const handleDeleteProduct = (id) => {
+  const handleDeleteProduct = async (id) => {
     const item = inventory.find(i => i.id === id);
     setInventory(prev => prev.filter(i => i.id !== id));
-    showToast(`Deleted "${item?.name || id}" from inventory`, 'info');
+
+    try {
+      await api.deleteProduct(id);
+      showToast(`Deleted "${item?.name || id}" from MongoDB`, 'info');
+    } catch (err) {
+      console.warn('Failed to delete product via API:', err.message);
+      showToast(`Deleted "${item?.name || id}" locally`, 'info');
+    }
   };
 
   // Order Actions
@@ -872,7 +1000,15 @@ export default function AdminPage() {
                         <tr key={item.id} className="hover:bg-[#FAF8F5]/80 transition-colors">
                           <td className="p-4">
                             <div className="flex items-center gap-3">
-                              <img src={item.image} alt={item.name} className="w-10 h-10 rounded-xl object-cover border border-[#D9D3C7]" />
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = '/images/products/autumn/tops/shirts/color_1_brown.jpeg';
+                                }}
+                                className="w-10 h-10 rounded-xl object-cover border border-[#D9D3C7]"
+                              />
                               <div>
                                 <div className="font-bold text-[#2D231E] text-sm">{item.name}</div>
                                 <div className="text-[10px] text-[#6B5E55]">{item.id} • {item.color} • {item.fit}</div>
