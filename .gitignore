@@ -100,6 +100,9 @@ lerna-debug.log*
 ehthumbs.db
 Thumbs.db
 desktop.ini
+.agents/
+.claude/
+.codex/
 .vscode/
 !.vscode/settings.json
 .idea/

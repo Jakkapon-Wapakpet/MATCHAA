@@ -306,6 +306,24 @@ export default function AdminPage() {
       } catch (err) {
         console.warn('Backend orders fetch fallback:', err.message);
       }
+
+      try {
+        const userRes = await api.getUsers();
+        if (isMounted && userRes && userRes.data && userRes.data.length > 0) {
+          const normalizedMembers = userRes.data.map((u, idx) => ({
+            id: u.userId || `MEM-${String(idx + 1).padStart(3, '0')}`,
+            name: u.name || 'Member',
+            email: u.email || 'N/A',
+            tier: u.tier || 'VIP Connoisseur',
+            totalSpent: u.totalSpent || 0,
+            orders: u.ordersCount || 0,
+            joined: u.createdAt ? u.createdAt.split('T')[0] : '2026-01-10'
+          }));
+          setMembers(normalizedMembers);
+        }
+      } catch (err) {
+        console.warn('Backend members fetch fallback:', err.message);
+      }
     }
 
     loadBackendData();

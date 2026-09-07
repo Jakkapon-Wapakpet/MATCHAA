@@ -80,6 +80,61 @@ export const api = {
     return fetchWithFallback(`/orders/${id}`);
   },
 
+  // Cart CRUD
+  getCart: async (userId = 'guest') => {
+    return fetchWithFallback(`/cart?userId=${encodeURIComponent(userId)}`);
+  },
+
+  addToCart: async (item, userId = 'guest') => {
+    return fetchWithFallback('/cart', {
+      method: 'POST',
+      body: JSON.stringify({ userId, item })
+    });
+  },
+
+  updateCartItem: async (itemId, quantity, userId = 'guest') => {
+    return fetchWithFallback(`/cart/${encodeURIComponent(itemId)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ userId, quantity })
+    });
+  },
+
+  deleteCartItem: async (itemId, userId = 'guest') => {
+    return fetchWithFallback(`/cart/${encodeURIComponent(itemId)}?userId=${encodeURIComponent(userId)}`, {
+      method: 'DELETE'
+    });
+  },
+
+  // Users CRUD
+  getUsers: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return fetchWithFallback(`/users${query ? `?${query}` : ''}`);
+  },
+
+  getUserById: async (id) => {
+    return fetchWithFallback(`/users/${id}`);
+  },
+
+  createUser: async (userData) => {
+    return fetchWithFallback('/users', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  },
+
+  updateUser: async (id, updateData) => {
+    return fetchWithFallback(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updateData)
+    });
+  },
+
+  deleteUser: async (id) => {
+    return fetchWithFallback(`/users/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
   // Fetch categories with product counts
   getCategories: async () => {
     try {

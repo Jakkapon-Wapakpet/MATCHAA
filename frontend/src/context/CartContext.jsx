@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useToast } from './ToastContext';
+import { api } from '../services/api';
 
 const CartContext = createContext(null);
 
-export const getCartKey = (item) => `${item.id}-${item.size || 'default'}-${item.color || 'default'}`;
+export const getCartKey = (item) => `${item.id || item.productId}-${item.size || 'default'}-${item.color || 'default'}`;
 
 const parsePrice = (price) => {
   if (typeof price === 'number') return price;
@@ -39,8 +40,9 @@ export function CartProvider({ children }) {
 
   const addToCart = useCallback((product, customQty) => {
     const amount = customQty || product.quantity || 1;
+    const key = getCartKey(product);
+
     setCartItems((prev) => {
-      const key = getCartKey(product);
       const idx = prev.findIndex((item) => getCartKey(item) === key);
       if (idx > -1) {
         const next = [...prev];
@@ -49,20 +51,48 @@ export function CartProvider({ children }) {
       }
       return [...prev, { ...product, quantity: amount }];
     });
+
+    // Background sync to backend MongoDB Cart API (Task 8.5)
+    api.addToCart({
+      itemId: key,
+      productId: product.id || product._id || 'SKU-ITEM',
+      name: product.name || 'MatchA Item',
+      price: parsePrice(product.price),
+      quantity: amount,
+      size: product.size || 'M',
+      color: product.color || 'Default',
+      image: product.image || ''
+    }).catch((err) => {
+      console.warn('Backend cart sync note:', err.message);
+    });
   }, []);
 
   const updateQty = useCallback((key, delta) => {
+    let newCalculatedQty = 1;
     setCartItems((prev) =>
-      prev.map((item) =>
-        getCartKey(item) === key
-          ? { ...item, quantity: Math.max(1, (item.quantity || 1) + delta) }
-          : item
-      )
+      prev.map((item) => {
+        if (getCartKey(item) === key) {
+          const qty = Math.max(1, (item.quantity || 1) + delta);
+          newCalculatedQty = qty;
+          return { ...item, quantity: qty };
+        }
+        return item;
+      })
     );
+
+    // Background sync to backend MongoDB Cart API (Task 8.6)
+    api.updateCartItem(key, newCalculatedQty).catch((err) => {
+      console.warn('Backend cart update note:', err.message);
+    });
   }, []);
 
   const removeItem = useCallback((key) => {
     setCartItems((prev) => prev.filter((item) => getCartKey(item) !== key));
+
+    // Background sync to backend MongoDB Cart API (Task 8.7)
+    api.deleteCartItem(key).catch((err) => {
+      console.warn('Backend cart delete note:', err.message);
+    });
   }, []);
 
   const clearCart = useCallback(() => {

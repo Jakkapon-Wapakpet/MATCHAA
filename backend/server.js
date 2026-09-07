@@ -32,12 +32,15 @@ app.get('/', (req, res) => {
   });
 });
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
+// Health check endpoint (Sprint 1 Task 3.5)
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({
-    status: 'online',
+    status: 'ok',
+    state: 'online',
     message: 'Backend server is running smoothly',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
 
@@ -47,6 +50,7 @@ const Cart = require('./models/Cart');
 const Order = require('./models/Order');
 const User = require('./models/User');
 const productsData = require('./data/products');
+
 
 // Sample Starter API endpoint
 app.get('/api/items', (req, res) => {
@@ -105,7 +109,7 @@ app.get('/api/categories', async (req, res) => {
 });
 
 // Full Catalog API with search, category, sort, price, inStock, and pagination (MongoDB)
-app.get('/api/products', async (req, res) => {
+app.get(['/api/products', '/api/admin/products'], async (req, res) => {
   try {
     const {
       category = 'ALL',
@@ -328,8 +332,8 @@ app.get('/api/products/:id', async (req, res) => {
   }
 });
 
-// Create Product Endpoint (Task 8.2 & Task 10)
-app.post('/api/products', async (req, res) => {
+// Create Product Endpoint (Task 8.2 & Task 10, Task 6.5)
+app.post(['/api/products', '/api/admin/products'], async (req, res) => {
   try {
     const {
       name,
@@ -388,8 +392,8 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-// Update Product / Stock Endpoint (Task 8.3)
-app.put('/api/products/:id', async (req, res) => {
+// Update Product / Stock Endpoint (Task 8.3 & Task 6.6)
+app.put(['/api/products/:id', '/api/admin/products/:id'], async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body };
@@ -424,8 +428,8 @@ app.put('/api/products/:id', async (req, res) => {
   }
 });
 
-// Delete Product Endpoint (Task 8.4)
-app.delete('/api/products/:id', async (req, res) => {
+// Delete Product Endpoint (Task 8.4 & Task 6.7)
+app.delete(['/api/products/:id', '/api/admin/products/:id'], async (req, res) => {
   try {
     const { id } = req.params;
     let deleted = null;
@@ -456,10 +460,10 @@ app.delete('/api/products/:id', async (req, res) => {
 // Cart CRUD Endpoints (Task 8.5, 8.6, 8.7)
 // ==========================================
 
-// Get user cart
-app.get('/api/cart', async (req, res) => {
+// Get user cart (Task 6.1 & 8.5)
+app.get(['/api/cart', '/api/cart/:userId'], async (req, res) => {
   try {
-    const userId = req.query.userId || 'guest';
+    const userId = req.params.userId || req.query.userId || 'guest';
     let cart = await Cart.findOne({ userId });
     if (!cart) {
       cart = { userId, items: [], totalAmount: 0 };
@@ -510,14 +514,15 @@ app.post('/api/cart', async (req, res) => {
   }
 });
 
-// Update item quantity in cart (Task 8.6)
-app.put('/api/cart/:itemId', async (req, res) => {
+// Update item quantity in cart (Task 8.6 & 6.4)
+app.put(['/api/cart/:itemId', '/api/cart/:userId/:itemId'], async (req, res) => {
   try {
     const { itemId } = req.params;
     const { userId = 'guest', quantity } = req.body;
+    const finalUserId = req.params.userId || userId;
     const newQty = Number(quantity);
 
-    let cart = await Cart.findOne({ userId });
+    let cart = await Cart.findOne({ userId: finalUserId });
     if (!cart) {
       return res.status(404).json({ success: false, message: 'Cart not found' });
     }
@@ -540,11 +545,11 @@ app.put('/api/cart/:itemId', async (req, res) => {
   }
 });
 
-// Delete item from cart (Task 8.7)
-app.delete('/api/cart/:itemId', async (req, res) => {
+// Delete item from cart (Task 8.7 & 6.3)
+app.delete(['/api/cart/:itemId', '/api/cart/:userId/:itemId'], async (req, res) => {
   try {
     const { itemId } = req.params;
-    const { userId = 'guest' } = req.query;
+    const userId = req.params.userId || req.query.userId || 'guest';
 
     let cart = await Cart.findOne({ userId });
     if (!cart) {
@@ -787,7 +792,7 @@ app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: `Cannot GET ${req.originalUrl}. Route not found on API server.`,
-    availableRoutes: ['/api/health', '/api/items']
+    availableRoutes: ['/api/health', '/api/products', '/api/categories', '/api/cart', '/api/orders', '/api/users']
   });
 });
 

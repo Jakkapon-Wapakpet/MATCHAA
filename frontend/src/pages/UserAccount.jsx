@@ -21,6 +21,7 @@ import FavoritesTab from '../components/account/FavoritesTab';
 import AddressesTab from '../components/account/AddressesTab';
 import PaymentMethodsTab from '../components/account/PaymentMethodsTab';
 import PreferencesTab from '../components/account/PreferencesTab';
+import { api } from '../services/api';
 
 export default function UserAccount() {
   const { currentUser, updateProfile, logout } = useAuth();
@@ -30,6 +31,7 @@ export default function UserAccount() {
   const [activeTab, setActiveTab] = useState('details');
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [orders, setOrders] = useState([]);
 
   const [profile, setProfile] = useState({
     firstName: currentUser?.firstName || currentUser?.name?.split(' ')[0] || 'Alex',
@@ -54,6 +56,39 @@ export default function UserAccount() {
         email: currentUser.email || prev.email
       }));
     }
+  }, [currentUser]);
+
+  useEffect(() => {
+    let isMounted = true;
+    api.getOrders()
+      .then((res) => {
+        if (isMounted && res && res.data && res.data.length > 0) {
+          const userEmail = currentUser?.email?.toLowerCase();
+          const filtered = userEmail
+            ? res.data.filter(o => o.customer?.email?.toLowerCase() === userEmail)
+            : res.data;
+          const displayList = filtered.length > 0 ? filtered : res.data;
+          const formatted = displayList.map((o) => ({
+            id: o.orderId || o._id,
+            date: o.createdAt
+              ? new Date(o.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+              : 'Today',
+            status: o.status ? o.status.charAt(0).toUpperCase() + o.status.slice(1) : 'Processing',
+            total: Number(o.total) || 0,
+            items: (o.items || []).map((i) => ({
+              name: i.name || 'MatchA Garment',
+              color: i.color || 'Default',
+              size: i.size || 'M',
+              qty: i.quantity || 1,
+              price: i.price || 0,
+              image: i.image || '/images/products/autumn/tops/shirts/color_1_brown.jpeg'
+            }))
+          }));
+          setOrders(formatted);
+        }
+      })
+      .catch((err) => console.warn('Order history fallback:', err.message));
+    return () => { isMounted = false; };
   }, [currentUser]);
 
   const menuItems = [
@@ -226,7 +261,7 @@ export default function UserAccount() {
               />
             )}
 
-            {activeTab === 'products' && <OrdersTab />}
+            {activeTab === 'products' && <OrdersTab orders={orders} />}
 
             {activeTab === 'favorites' && <FavoritesTab />}
 
