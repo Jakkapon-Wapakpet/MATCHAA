@@ -1,5 +1,5 @@
 // MatchA Curated Editorial Spreads (Luxury Magazine Art Direction)
-// Hand-crafted editorial stories with interactive shoppable garment pins & real catalog linkages
+// Hero-matched editorial garments use independent LOOK IDs to avoid collisions with catalog products.
 
 export const curatedEditorialSpreads = [
   {
@@ -29,50 +29,63 @@ export const curatedEditorialSpreads = [
     ],
     hotspots: [
       {
-        id: 'HS-01-1',
-        x: '48%',
-        y: '32%',
-        title: 'MatchA Heritage Work Jacket',
-        category: 'Outerwear',
-        price: 125,
-        productId: 'AUT-TOP-005',
-        image: '/images/lookbook_curated/lookbook_ginza_jacket.jpg'
+        "id": "HS-01-jacket",
+        "x": "40%",
+        "y": "36%",
+        "title": "Holographic Longline Jacket",
+        "category": "Outerwear",
+        "price": 125,
+        "color": "Iridescent Lilac",
+        "productId": "LOOK-01-JACKET",
+        "image": "/images/lookbook_flatlay/01-jacket.png"
       },
       {
-        id: 'HS-01-2',
-        x: '52%',
-        y: '68%',
-        title: 'MatchA Pleated Relaxed Chinos',
-        category: 'Bottoms',
-        price: 88,
-        productId: 'AUT-BOT-002',
-        image: '/images/lookbook_curated/lookbook_ginza_chinos.jpg'
+        "id": "HS-01-crop",
+        "x": "52%",
+        "y": "40%",
+        "title": "Metallic Silver Bustier Top",
+        "category": "Tops",
+        "price": 44,
+        "color": "Metallic Silver",
+        "productId": "LOOK-01-CROP",
+        "image": "/images/lookbook_flatlay/01-crop.png"
+      },
+      {
+        "id": "HS-01-cargo",
+        "x": "52%",
+        "y": "66%",
+        "title": "Strapped Technical Cargo Pants",
+        "category": "Bottoms",
+        "price": 88,
+        "color": "Black",
+        "productId": "LOOK-01-CARGO",
+        "image": "/images/lookbook_flatlay/01-cargo.png"
       }
     ],
     shoppableItems: [
       {
-        id: 'AUT-TOP-005',
-        name: 'MatchA Heritage Work Jacket',
-        price: 125,
-        category: 'Outerwear',
-        color: 'Earth Brown',
-        image: '/images/lookbook_curated/lookbook_ginza_jacket.jpg'
+        "id": "LOOK-01-JACKET",
+        "name": "Holographic Longline Jacket",
+        "price": 125,
+        "category": "Outerwear",
+        "color": "Iridescent Lilac",
+        "image": "/images/lookbook_flatlay/01-jacket.png"
       },
       {
-        id: 'AUT-BOT-002',
-        name: 'MatchA Pleated Relaxed Chinos',
-        price: 88,
-        category: 'Bottoms',
-        color: 'Olive Green',
-        image: '/images/lookbook_curated/lookbook_ginza_chinos.jpg'
+        "id": "LOOK-01-CROP",
+        "name": "Metallic Silver Bustier Top",
+        "price": 44,
+        "category": "Tops",
+        "color": "Metallic Silver",
+        "image": "/images/lookbook_flatlay/01-crop.png"
       },
       {
-        id: 'AUT-ACC-001',
-        name: 'Autumn Leather Utility Bag',
-        price: 44,
-        category: 'Accessories',
-        color: 'Burnt Orange',
-        image: '/images/products/autumn/accessories/bags/color_1_burnt_orange.jpeg'
+        "id": "LOOK-01-CARGO",
+        "name": "Strapped Technical Cargo Pants",
+        "price": 88,
+        "category": "Bottoms",
+        "color": "Black",
+        "image": "/images/lookbook_flatlay/01-cargo.png"
       }
     ]
   },
@@ -103,50 +116,63 @@ export const curatedEditorialSpreads = [
     ],
     hotspots: [
       {
-        id: 'HS-02-1',
-        x: '50%',
-        y: '30%',
-        title: 'MatchA Botanical Knit Cardigan',
-        category: 'Outerwear',
-        price: 110,
-        productId: 'SPR-TOP-011',
-        image: '/images/lookbook_curated/lookbook_shinjuku_cardigan.jpg'
+        "id": "HS-02-blazer",
+        "x": "62%",
+        "y": "42%",
+        "title": "Ivory Linen Tailored Blazer",
+        "category": "Outerwear",
+        "price": 110,
+        "color": "Warm Ivory",
+        "productId": "LOOK-02-BLAZER",
+        "image": "/images/lookbook_flatlay/02-blazer.png"
       },
       {
-        id: 'HS-02-2',
-        x: '46%',
-        y: '72%',
-        title: 'Raw Edge Relaxed Trouser',
-        category: 'Bottoms',
-        price: 82,
-        productId: 'SPR-BOT-014',
-        image: '/images/products/autumn/bottoms/jeans/color_1_brown.jpeg'
+        "id": "HS-02-shirt",
+        "x": "49%",
+        "y": "48%",
+        "title": "Relaxed Linen Shirt",
+        "category": "Tops",
+        "price": 38,
+        "color": "Warm Ivory",
+        "productId": "LOOK-02-SHIRT",
+        "image": "/images/lookbook_flatlay/02-shirt.png"
+      },
+      {
+        "id": "HS-02-trousers",
+        "x": "53%",
+        "y": "70%",
+        "title": "Straight Linen Trousers",
+        "category": "Bottoms",
+        "price": 82,
+        "color": "Warm Ivory",
+        "productId": "LOOK-02-TROUSERS",
+        "image": "/images/lookbook_flatlay/02-trousers.png"
       }
     ],
     shoppableItems: [
       {
-        id: 'SPR-TOP-011',
-        name: 'MatchA Botanical Knit Cardigan',
-        price: 110,
-        category: 'Outerwear',
-        color: 'Matcha Forest',
-        image: '/images/lookbook_curated/lookbook_shinjuku_cardigan.jpg'
+        "id": "LOOK-02-BLAZER",
+        "name": "Ivory Linen Tailored Blazer",
+        "price": 110,
+        "category": "Outerwear",
+        "color": "Warm Ivory",
+        "image": "/images/lookbook_flatlay/02-blazer.png"
       },
       {
-        id: 'SPR-BOT-014',
-        name: 'Raw Edge Relaxed Trouser',
-        price: 82,
-        category: 'Bottoms',
-        color: 'Natural Ecru',
-        image: '/images/products/autumn/bottoms/jeans/color_1_brown.jpeg'
+        "id": "LOOK-02-SHIRT",
+        "name": "Relaxed Linen Shirt",
+        "price": 38,
+        "category": "Tops",
+        "color": "Warm Ivory",
+        "image": "/images/lookbook_flatlay/02-shirt.png"
       },
       {
-        id: 'SPR-ACC-013',
-        name: 'Canvas Mini Crossbody Bag',
-        price: 38,
-        category: 'Accessories',
-        color: 'Soft Sage',
-        image: '/images/products/autumn/accessories/bags/color_1_burnt_orange.jpeg'
+        "id": "LOOK-02-TROUSERS",
+        "name": "Straight Linen Trousers",
+        "price": 82,
+        "category": "Bottoms",
+        "color": "Warm Ivory",
+        "image": "/images/lookbook_flatlay/02-trousers.png"
       }
     ]
   },
@@ -177,50 +203,63 @@ export const curatedEditorialSpreads = [
     ],
     hotspots: [
       {
-        id: 'HS-03-1',
-        x: '45%',
-        y: '28%',
-        title: 'Coastal Open-Collar Linen Shirt',
-        category: 'Tops',
-        price: 64,
-        productId: 'SUM-TOP-033',
-        image: '/images/lookbook_curated/lookbook_enoshima_shirt.jpg'
+        "id": "HS-03-cape",
+        "x": "38%",
+        "y": "43%",
+        "title": "White Draped Cape Blazer",
+        "category": "Outerwear",
+        "price": 64,
+        "color": "White",
+        "productId": "LOOK-03-CAPE",
+        "image": "/images/lookbook_flatlay/03-cape.png"
       },
       {
-        id: 'HS-03-2',
-        x: '48%',
-        y: '65%',
-        title: 'Summer Pleated Linen Shorts',
-        category: 'Bottoms',
-        price: 54,
-        productId: 'SUM-BOT-028',
-        image: '/images/products/autumn/bottoms/chinos/color_1_olive.jpeg'
+        "id": "HS-03-camisole",
+        "x": "54%",
+        "y": "44%",
+        "title": "White V-Neck Camisole",
+        "category": "Tops",
+        "price": 34,
+        "color": "White",
+        "productId": "LOOK-03-CAMISOLE",
+        "image": "/images/lookbook_flatlay/03-camisole.png"
+      },
+      {
+        "id": "HS-03-trousers",
+        "x": "56%",
+        "y": "65%",
+        "title": "Ivory Ankle Trousers",
+        "category": "Bottoms",
+        "price": 54,
+        "color": "Ivory Cream",
+        "productId": "LOOK-03-TROUSERS",
+        "image": "/images/lookbook_flatlay/03-trousers.png"
       }
     ],
     shoppableItems: [
       {
-        id: 'SUM-TOP-033',
-        name: 'Coastal Open-Collar Linen Shirt',
-        price: 64,
-        category: 'Tops',
-        color: 'Sage Matcha',
-        image: '/images/lookbook_curated/lookbook_enoshima_shirt.jpg'
+        "id": "LOOK-03-CAPE",
+        "name": "White Draped Cape Blazer",
+        "price": 64,
+        "category": "Outerwear",
+        "color": "White",
+        "image": "/images/lookbook_flatlay/03-cape.png"
       },
       {
-        id: 'SUM-BOT-028',
-        name: 'Summer Pleated Linen Shorts',
-        price: 54,
-        category: 'Bottoms',
-        color: 'Natural Cream',
-        image: '/images/products/autumn/bottoms/chinos/color_1_olive.jpeg'
+        "id": "LOOK-03-CAMISOLE",
+        "name": "White V-Neck Camisole",
+        "price": 34,
+        "category": "Tops",
+        "color": "White",
+        "image": "/images/lookbook_flatlay/03-camisole.png"
       },
       {
-        id: 'SUM-ACC-025',
-        name: 'MatchA Woven Straw Bucket Hat',
-        price: 34,
-        category: 'Accessories',
-        color: 'Oatmeal',
-        image: '/images/products/autumn/accessories/scarves/color_1_burnt_orange.jpeg'
+        "id": "LOOK-03-TROUSERS",
+        "name": "Ivory Ankle Trousers",
+        "price": 54,
+        "category": "Bottoms",
+        "color": "Ivory Cream",
+        "image": "/images/lookbook_flatlay/03-trousers.png"
       }
     ]
   },
@@ -251,50 +290,44 @@ export const curatedEditorialSpreads = [
     ],
     hotspots: [
       {
-        id: 'HS-04-1',
-        x: '50%',
-        y: '34%',
-        title: 'MatchA Technical Fishtail Parka',
-        category: 'Outerwear',
-        price: 145,
-        productId: 'WIN-TOP-051',
-        image: '/images/lookbook_curated/lookbook_odaiba_parka.jpg'
+        "id": "HS-04-blazer",
+        "x": "52%",
+        "y": "39%",
+        "title": "Copper Sequin Tailored Blazer",
+        "category": "Outerwear",
+        "price": 145,
+        "color": "Copper Bronze",
+        "productId": "LOOK-04-BLAZER",
+        "image": "/images/lookbook_flatlay/04-blazer.png"
       },
       {
-        id: 'HS-04-2',
-        x: '52%',
-        y: '70%',
-        title: 'Stealth Tapered Cargo Pants',
-        category: 'Bottoms',
-        price: 96,
-        productId: 'WIN-BOT-044',
-        image: '/images/products/autumn/bottoms/jeans/color_1_brown.jpeg'
+        "id": "HS-04-trousers",
+        "x": "55%",
+        "y": "70%",
+        "title": "Copper Sequin Wide-Leg Trousers",
+        "category": "Bottoms",
+        "price": 96,
+        "color": "Copper Bronze",
+        "productId": "LOOK-04-TROUSERS",
+        "image": "/images/lookbook_flatlay/04-trousers.png"
       }
     ],
     shoppableItems: [
       {
-        id: 'WIN-TOP-051',
-        name: 'MatchA Technical Fishtail Parka',
-        price: 145,
-        category: 'Outerwear',
-        color: 'Matte Charcoal',
-        image: '/images/lookbook_curated/lookbook_odaiba_parka.jpg'
+        "id": "LOOK-04-BLAZER",
+        "name": "Copper Sequin Tailored Blazer",
+        "price": 145,
+        "category": "Outerwear",
+        "color": "Copper Bronze",
+        "image": "/images/lookbook_flatlay/04-blazer.png"
       },
       {
-        id: 'WIN-BOT-044',
-        name: 'Stealth Tapered Cargo Pants',
-        price: 96,
-        category: 'Bottoms',
-        color: 'Obsidian Black',
-        image: '/images/products/autumn/bottoms/jeans/color_1_brown.jpeg'
-      },
-      {
-        id: 'WIN-ACC-039',
-        name: 'Thermal Technical Beanie',
-        price: 28,
-        category: 'Accessories',
-        color: 'Charcoal',
-        image: '/images/products/autumn/accessories/scarves/color_1_burnt_orange.jpeg'
+        "id": "LOOK-04-TROUSERS",
+        "name": "Copper Sequin Wide-Leg Trousers",
+        "price": 96,
+        "category": "Bottoms",
+        "color": "Copper Bronze",
+        "image": "/images/lookbook_flatlay/04-trousers.png"
       }
     ]
   },
@@ -325,32 +358,44 @@ export const curatedEditorialSpreads = [
     ],
     hotspots: [
       {
-        id: 'HS-05-1',
-        x: '46%',
-        y: '35%',
-        title: 'MatchA Knit Fisherman Sweater',
-        category: 'Tops',
-        price: 110,
-        productId: 'AUT-TOP-003',
-        image: '/images/lookbook_curated/lookbook_kyoto_sweater.jpg'
+        "id": "HS-05-sweater",
+        "x": "51%",
+        "y": "42%",
+        "title": "Charcoal Cable-Knit Sweater",
+        "category": "Tops",
+        "price": 110,
+        "color": "Charcoal Marl",
+        "productId": "LOOK-05-SWEATER",
+        "image": "/images/lookbook_flatlay/05-sweater.png"
+      },
+      {
+        "id": "HS-05-cargo",
+        "x": "55%",
+        "y": "67%",
+        "title": "Washed Tapered Cargo Pants",
+        "category": "Bottoms",
+        "price": 92,
+        "color": "Dark Brown Charcoal",
+        "productId": "LOOK-05-CARGO",
+        "image": "/images/lookbook_flatlay/05-cargo.png"
       }
     ],
     shoppableItems: [
       {
-        id: 'AUT-TOP-003',
-        name: 'MatchA Knit Fisherman Sweater',
-        price: 110,
-        category: 'Tops',
-        color: 'Matcha Cream',
-        image: '/images/lookbook_curated/lookbook_kyoto_sweater.jpg'
+        "id": "LOOK-05-SWEATER",
+        "name": "Charcoal Cable-Knit Sweater",
+        "price": 110,
+        "category": "Tops",
+        "color": "Charcoal Marl",
+        "image": "/images/lookbook_flatlay/05-sweater.png"
       },
       {
-        id: 'AUT-BOT-008',
-        name: 'MatchA Relaxed Classic Jeans',
-        price: 92,
-        category: 'Bottoms',
-        color: 'Earth Brown',
-        image: '/images/products/autumn/bottoms/jeans/color_1_brown.jpeg'
+        "id": "LOOK-05-CARGO",
+        "name": "Washed Tapered Cargo Pants",
+        "price": 92,
+        "category": "Bottoms",
+        "color": "Dark Brown Charcoal",
+        "image": "/images/lookbook_flatlay/05-cargo.png"
       }
     ]
   },
@@ -381,32 +426,63 @@ export const curatedEditorialSpreads = [
     ],
     hotspots: [
       {
-        id: 'HS-06-1',
-        x: '52%',
-        y: '30%',
-        title: 'Spring Fine-Knit Cardigan',
-        category: 'Tops',
-        price: 78,
-        productId: 'SPR-TOP-022',
-        image: '/images/products/autumn/tops/sweaters/color_1_burnt_orange.jpeg'
+        "id": "HS-06-vest",
+        "x": "50%",
+        "y": "42%",
+        "title": "Orange Utility Vest",
+        "category": "Outerwear",
+        "price": 78,
+        "color": "Signal Orange",
+        "productId": "LOOK-06-VEST",
+        "image": "/images/lookbook_flatlay/06-vest.png"
+      },
+      {
+        "id": "HS-06-shirt",
+        "x": "35%",
+        "y": "42%",
+        "title": "Black Crew-Neck T-Shirt",
+        "category": "Tops",
+        "price": 28,
+        "color": "Black",
+        "productId": "LOOK-06-SHIRT",
+        "image": "/images/lookbook_flatlay/06-shirt.png"
+      },
+      {
+        "id": "HS-06-shorts",
+        "x": "52%",
+        "y": "60%",
+        "title": "Technical Cargo Shorts",
+        "category": "Bottoms",
+        "price": 84,
+        "color": "Black",
+        "productId": "LOOK-06-SHORTS",
+        "image": "/images/lookbook_flatlay/06-shorts.png"
       }
     ],
     shoppableItems: [
       {
-        id: 'SPR-TOP-022',
-        name: 'Spring Fine-Knit Cardigan',
-        price: 78,
-        category: 'Tops',
-        color: 'Warm Peach',
-        image: '/images/products/autumn/tops/sweaters/color_1_burnt_orange.jpeg'
+        "id": "LOOK-06-VEST",
+        "name": "Orange Utility Vest",
+        "price": 78,
+        "category": "Outerwear",
+        "color": "Signal Orange",
+        "image": "/images/lookbook_flatlay/06-vest.png"
       },
       {
-        id: 'SPR-BOT-015',
-        name: 'MatchA Ecru Wide Trousers',
-        price: 84,
-        category: 'Bottoms',
-        color: 'Natural Ecru',
-        image: '/images/products/autumn/bottoms/chinos/color_1_olive.jpeg'
+        "id": "LOOK-06-SHIRT",
+        "name": "Black Crew-Neck T-Shirt",
+        "price": 28,
+        "category": "Tops",
+        "color": "Black",
+        "image": "/images/lookbook_flatlay/06-shirt.png"
+      },
+      {
+        "id": "LOOK-06-SHORTS",
+        "name": "Technical Cargo Shorts",
+        "price": 84,
+        "category": "Bottoms",
+        "color": "Black",
+        "image": "/images/lookbook_flatlay/06-shorts.png"
       }
     ]
   }

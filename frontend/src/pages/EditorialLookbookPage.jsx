@@ -449,7 +449,7 @@ export default function EditorialLookbookPage() {
                                 src={hs.image} 
                                 alt={hs.title} 
                                 onError={handleImageError} 
-                                className="w-12 h-14 object-cover rounded-xl bg-neutral-100 shrink-0 border border-[#D9D3C7]" 
+                                className="w-12 h-14 object-contain rounded-xl bg-[#FAF8F5] shrink-0 border border-[#D9D3C7]" 
                               />
                               <div className="min-w-0 flex-1">
                                 <span className="text-[9px] font-mono uppercase text-[#BC5A36] font-bold block">
@@ -596,7 +596,7 @@ export default function EditorialLookbookPage() {
                                 src={item.image} 
                                 alt={item.name} 
                                 onError={handleImageError} 
-                                className={`w-11 h-13 object-cover rounded-xl bg-white border border-[#D9D3C7] shrink-0 transition-transform duration-300 ${
+                                className={`w-11 h-13 object-contain rounded-xl bg-[#FAF8F5] border border-[#D9D3C7] shrink-0 transition-transform duration-300 ${
                                   isHovered ? 'scale-108' : ''
                                 }`} 
                               />
@@ -803,7 +803,8 @@ export default function EditorialLookbookPage() {
                             key={item.id}
                             className="flex items-center justify-between py-2 border-b border-[#D9D3C7]/40 last:border-none text-xs hover:bg-[#FAF8F5] px-1 rounded-lg transition-colors"
                           >
-                            <div className="min-w-0 pr-2">
+                            <img src={item.image} alt={item.name} loading="lazy" onError={handleImageError} className="w-12 h-14 object-contain rounded-lg bg-[#FAF8F5] border border-[#D9D3C7] shrink-0 mr-3" />
+                            <div className="min-w-0 pr-2 flex-1">
                               <span className="font-bold text-[#2D231E] block truncate">{item.name}</span>
                               <span className="text-[10px] font-mono text-[#6B5E55]">${item.price.toFixed(2)}</span>
                             </div>
@@ -948,7 +949,8 @@ export default function EditorialLookbookPage() {
                         const isAdded = addedItems[item.id];
                         return (
                           <div key={item.id} className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-[#D9D3C7] hover:border-[#2D5A27] transition-all">
-                            <div className="min-w-0 pr-2">
+                            <img src={item.image} alt={item.name} loading="lazy" onError={handleImageError} className="w-12 h-14 object-contain rounded-lg bg-[#FAF8F5] border border-[#D9D3C7] shrink-0 mr-3" />
+                            <div className="min-w-0 pr-2 flex-1">
                               <div className="text-xs font-bold text-[#2D231E] truncate">{item.name}</div>
                               <div className="text-[11px] font-mono text-[#2D5A27] font-bold">${item.price.toFixed(2)}</div>
                             </div>

@@ -180,8 +180,11 @@ ENV/
 *.drawio.bkp
 *.drawio.dtmp
 
-# 15. AI Generated Lookbook Curated Assets
+# 15. AI Generated Lookbook Curated & Flatlay Assets
 frontend/public/images/lookbook_curated/*
 !frontend/public/images/lookbook_curated/.gitkeep
+frontend/public/images/lookbook_flatlay/*
+!frontend/public/images/lookbook_flatlay/.gitkeep
+
 
 
