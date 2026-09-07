@@ -36,7 +36,7 @@ export const curatedEditorialSpreads = [
         category: 'Outerwear',
         price: 125,
         productId: 'AUT-TOP-005',
-        image: '/images/products/autumn/tops/jackets/color_1_brown.jpeg'
+        image: '/images/lookbook_curated/lookbook_ginza_jacket.jpg'
       },
       {
         id: 'HS-01-2',
@@ -46,7 +46,7 @@ export const curatedEditorialSpreads = [
         category: 'Bottoms',
         price: 88,
         productId: 'AUT-BOT-002',
-        image: '/images/products/autumn/bottoms/chinos/color_1_olive.jpeg'
+        image: '/images/lookbook_curated/lookbook_ginza_chinos.jpg'
       }
     ],
     shoppableItems: [
@@ -56,7 +56,7 @@ export const curatedEditorialSpreads = [
         price: 125,
         category: 'Outerwear',
         color: 'Earth Brown',
-        image: '/images/products/autumn/tops/jackets/color_1_brown.jpeg'
+        image: '/images/lookbook_curated/lookbook_ginza_jacket.jpg'
       },
       {
         id: 'AUT-BOT-002',
@@ -64,7 +64,7 @@ export const curatedEditorialSpreads = [
         price: 88,
         category: 'Bottoms',
         color: 'Olive Green',
-        image: '/images/products/autumn/bottoms/chinos/color_1_olive.jpeg'
+        image: '/images/lookbook_curated/lookbook_ginza_chinos.jpg'
       },
       {
         id: 'AUT-ACC-001',
@@ -106,11 +106,11 @@ export const curatedEditorialSpreads = [
         id: 'HS-02-1',
         x: '50%',
         y: '30%',
-        title: 'Spring Tailored Linen Blazer',
+        title: 'MatchA Botanical Knit Cardigan',
         category: 'Outerwear',
         price: 110,
         productId: 'SPR-TOP-011',
-        image: '/images/products/autumn/tops/shirts/color_1_brown.jpeg'
+        image: '/images/lookbook_curated/lookbook_shinjuku_cardigan.jpg'
       },
       {
         id: 'HS-02-2',
@@ -126,11 +126,11 @@ export const curatedEditorialSpreads = [
     shoppableItems: [
       {
         id: 'SPR-TOP-011',
-        name: 'Spring Tailored Linen Blazer',
+        name: 'MatchA Botanical Knit Cardigan',
         price: 110,
         category: 'Outerwear',
-        color: 'Peach Coral',
-        image: '/images/products/autumn/tops/shirts/color_1_brown.jpeg'
+        color: 'Matcha Forest',
+        image: '/images/lookbook_curated/lookbook_shinjuku_cardigan.jpg'
       },
       {
         id: 'SPR-BOT-014',
@@ -184,7 +184,7 @@ export const curatedEditorialSpreads = [
         category: 'Tops',
         price: 64,
         productId: 'SUM-TOP-033',
-        image: '/images/products/autumn/tops/shirts/color_1_brown.jpeg'
+        image: '/images/lookbook_curated/lookbook_enoshima_shirt.jpg'
       },
       {
         id: 'HS-03-2',
@@ -203,8 +203,8 @@ export const curatedEditorialSpreads = [
         name: 'Coastal Open-Collar Linen Shirt',
         price: 64,
         category: 'Tops',
-        color: 'Sky Blue',
-        image: '/images/products/autumn/tops/shirts/color_1_brown.jpeg'
+        color: 'Sage Matcha',
+        image: '/images/lookbook_curated/lookbook_enoshima_shirt.jpg'
       },
       {
         id: 'SUM-BOT-028',
@@ -254,11 +254,11 @@ export const curatedEditorialSpreads = [
         id: 'HS-04-1',
         x: '50%',
         y: '34%',
-        title: 'Winter High-Collar Parka',
+        title: 'MatchA Technical Fishtail Parka',
         category: 'Outerwear',
         price: 145,
         productId: 'WIN-TOP-051',
-        image: '/images/products/autumn/tops/jackets/color_1_brown.jpeg'
+        image: '/images/lookbook_curated/lookbook_odaiba_parka.jpg'
       },
       {
         id: 'HS-04-2',
@@ -274,11 +274,11 @@ export const curatedEditorialSpreads = [
     shoppableItems: [
       {
         id: 'WIN-TOP-051',
-        name: 'Winter High-Collar Parka',
+        name: 'MatchA Technical Fishtail Parka',
         price: 145,
         category: 'Outerwear',
-        color: 'Deep Cobalt',
-        image: '/images/products/autumn/tops/jackets/color_1_brown.jpeg'
+        color: 'Matte Charcoal',
+        image: '/images/lookbook_curated/lookbook_odaiba_parka.jpg'
       },
       {
         id: 'WIN-BOT-044',
@@ -328,21 +328,21 @@ export const curatedEditorialSpreads = [
         id: 'HS-05-1',
         x: '46%',
         y: '35%',
-        title: 'Mineral Loopback Fleece Hoodie',
+        title: 'MatchA Knit Fisherman Sweater',
         category: 'Tops',
         price: 110,
         productId: 'AUT-TOP-003',
-        image: '/images/products/autumn/tops/hoodies/color_1_burnt_orange.jpeg'
+        image: '/images/lookbook_curated/lookbook_kyoto_sweater.jpg'
       }
     ],
     shoppableItems: [
       {
         id: 'AUT-TOP-003',
-        name: 'Mineral Loopback Fleece Hoodie',
+        name: 'MatchA Knit Fisherman Sweater',
         price: 110,
         category: 'Tops',
-        color: 'Burnt Orange',
-        image: '/images/products/autumn/tops/hoodies/color_1_burnt_orange.jpeg'
+        color: 'Matcha Cream',
+        image: '/images/lookbook_curated/lookbook_kyoto_sweater.jpg'
       },
       {
         id: 'AUT-BOT-008',
