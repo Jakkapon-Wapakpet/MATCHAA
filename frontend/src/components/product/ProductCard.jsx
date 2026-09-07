@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { flyToCart } from '../../utils/flyToCart';
+import React, { useRef, useState } from 'react';
 import { Heart, ShoppingBag, Eye, Star, Check } from 'lucide-react';
 import { handleImageError } from '../../utils/imageFallback';
 import { useCart } from '../../context/CartContext';
@@ -28,6 +29,7 @@ export default function ProductCard({
 
   const [activeVariant, setActiveVariant] = useState(variants[0]);
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || 'M');
+  const cardRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
   const [wishlistActive, setWishlistActive] = useState(isWishlisted);
   const [justAdded, setJustAdded] = useState(false);
@@ -65,6 +67,8 @@ export default function ProductCard({
       quantity: 1
     };
 
+    flyToCart(cardRef.current);
+
     if (onAddToCart) {
       onAddToCart(itemToAdd);
     } else if (contextAddToCart) {
@@ -84,6 +88,7 @@ export default function ProductCard({
 
   return (
     <div
+      ref={cardRef}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="group relative bg-white border border-[#D9D3C7] hover:border-[#2D5A27] rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col justify-between select-none"

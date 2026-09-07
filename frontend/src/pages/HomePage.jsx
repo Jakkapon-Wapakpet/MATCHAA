@@ -6,6 +6,8 @@ import BrandLoop from '../components/home/BrandLoop';
 import VdoSection from '../components/home/VdoSection';
 import PulsePerks from '../components/home/PulsePerks';
 import JoinDropList from '../components/home/JoinDropList';
+import usePrefersReducedMotion from '../hooks/usePrefersReducedMotion';
+import '../styles/home-motion.css';
 
 export default function HomePage({
   onSelectFit,
@@ -15,13 +17,14 @@ export default function HomePage({
   onExploreCatalog,
   onSubscribe,
 }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const handleScrollToFit = () => {
     const el = document.getElementById('fit-guide');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div className="w-full bg-[#FAF8F5]">
+    <div data-motion={prefersReducedMotion ? 'reduced' : 'full'} className="home-page w-full bg-[#FAF8F5]">
       
       {/* 1. MASTER HERO: Editorial 4-Slice Interactive Lookbook Cover */}
       <section id="brand-hero">
@@ -34,7 +37,7 @@ export default function HomePage({
       </section>
 
       {/* 3. STREET FAVORITES & ARCHIVE: Continuous Framed Carousel with Real Product Shots */}
-      <section id="street-favorites">
+      <section id="street-favorites" data-reveal="products">
         <StreetFavorites 
           onAddToCart={onAddToCart} 
           onQuickView={onQuickView}
@@ -46,7 +49,7 @@ export default function HomePage({
       <BrandLoop />
 
       {/* 4. CINEMATIC TEXTURE REEL: Urban Motion Video + 15% Special Promo Glass Card */}
-      <section id="cinematic-reel">
+      <section id="cinematic-reel" data-reveal="film">
         <VdoSection onClaimPromo={onClaimPromo} />
       </section>
 

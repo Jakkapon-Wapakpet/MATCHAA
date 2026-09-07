@@ -1,11 +1,38 @@
 import { productsData } from '../data/productsData';
 
 const API_BASE = '/api';
+const TOKEN_KEY = 'matcha_token';
+
+export function getToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY) || null;
+  } catch {
+    return null;
+  }
+}
+
+export function setToken(token, remember = true) {
+  try {
+    const store = remember ? localStorage : sessionStorage;
+    const other = remember ? sessionStorage : localStorage;
+    if (token) {
+      store.setItem(TOKEN_KEY, token);
+      other.removeItem(TOKEN_KEY);
+    } else {
+      localStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(TOKEN_KEY);
+    }
+  } catch {
+    // Storage can be unavailable in private mode; the session simply won't persist.
+  }
+}
 const DIRECT_API = 'http://localhost:5000/api';
 
 async function fetchWithFallback(endpoint, options = {}) {
+  const token = getToken();
   const headers = {
     'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {})
   };
   const config = { ...options, headers };
@@ -113,6 +140,24 @@ export const api = {
 
   getUserById: async (id) => {
     return fetchWithFallback(`/users/${id}`);
+  },
+
+  login: async (email, password) => {
+    return fetchWithFallback('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    });
+  },
+
+  register: async (payload) => {
+    return fetchWithFallback('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  me: async () => {
+    return fetchWithFallback('/auth/me');
   },
 
   createUser: async (userData) => {

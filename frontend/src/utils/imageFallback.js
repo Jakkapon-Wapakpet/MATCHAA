@@ -1,5 +1,5 @@
-// Standard High-Quality MatchA Image Fallback Placeholder
-export const DEFAULT_PRODUCT_FALLBACK = 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80';
+// Standard High-Quality MatchA Image Fallback Placeholder (Minimalist Artisan Garment)
+export const DEFAULT_PRODUCT_FALLBACK = '/images/products/autumn/tops/jackets/color_1_brown.jpeg';
 
 export const handleImageError = (e, fallback = DEFAULT_PRODUCT_FALLBACK) => {
   if (e?.target && e.target.src !== fallback) {

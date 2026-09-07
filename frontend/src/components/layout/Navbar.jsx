@@ -133,6 +133,7 @@ export default function Navbar({
             <button
               onClick={onOpenCart}
               aria-label="View Cart"
+              data-cart-target
               className={`relative p-2.5 rounded-xl bg-[#D0DEC6]/60 hover:bg-[#D0DEC6] text-[#2D231E] hover:text-[#2D5A27] border border-[#B8CBAE] transition-all cursor-pointer ${
                 cartAnimated ? 'animate-cart-pop ring-3 ring-[#BC5A36] bg-[#D0DEC6]' : ''
               }`}

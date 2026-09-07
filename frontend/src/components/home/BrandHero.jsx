@@ -1,43 +1,43 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shuffle, Play, Pause, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import usePrefersReducedMotion from '../../hooks/usePrefersReducedMotion';
 
 export default function BrandHero({ onShopNow, onEnterWebsite }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const sectionRef = useRef(null);
   const [stickyOffset, setStickyOffset] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
 
-  // Guarantee silky-smooth sticky pinning and dynamic scale-down on scroll
+  // Pin the masthead and scale it down as the hero scrolls away. Lenis smooth
+  // scroll swallows almost every native scroll event (one per gesture), so the
+  // position is sampled each frame instead; React bails out when it is unchanged.
   useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (!sectionRef.current) return;
-          const rect = sectionRef.current.getBoundingClientRect();
-          const maxShift = sectionRef.current.offsetHeight - window.innerHeight;
+    if (prefersReducedMotion) {
+      setStickyOffset(0);
+      setScrollProgress(0);
+      return;
+    }
+    let frame = 0;
+    const measure = () => {
+      frame = requestAnimationFrame(measure);
+      const section = sectionRef.current;
+      if (!section) return;
+      const rect = section.getBoundingClientRect();
+      const maxShift = section.offsetHeight - window.innerHeight;
 
-          if (rect.top <= 0 && rect.bottom >= 150) {
-            const shift = Math.min(Math.max(-rect.top, 0), maxShift > 0 ? maxShift : 0);
-            setStickyOffset(shift);
-            if (maxShift > 0) {
-              const progress = Math.min(Math.max(-rect.top / maxShift, 0), 1);
-              setScrollProgress(progress);
-            }
-          } else if (rect.top > 0) {
-            setStickyOffset(0);
-            setScrollProgress(0);
-          }
-          ticking = false;
-        });
-        ticking = true;
+      if (rect.top <= 0 && rect.bottom >= 150 && maxShift > 0) {
+        setStickyOffset(Math.min(Math.max(-rect.top, 0), maxShift));
+        setScrollProgress(Math.min(Math.max(-rect.top / maxShift, 0), 1));
+      } else if (rect.top > 0) {
+        setStickyOffset(0);
+        setScrollProgress(0);
       }
     };
+    frame = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(frame);
+  }, [prefersReducedMotion]);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-  // 10 Strictly Verified Studio White Background Front-Facing Models (100% Facing Forward)
+  // Studio model references for the four independently shuffled slices.
   const models = [
     {
       id: 'LOOK-01',
@@ -94,58 +94,19 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
   // Each slice model index (Initialized with a dynamic multi-color random mix)
   const [sliceModels, setSliceModels] = useState([0, 4, 2, 5]);
 
-  // Track auto-play running state for each of the 4 slices: [slice0, slice1, slice2, slice3]
-  // Auto-run on page load by default with 1.30s interval per user request
-  const [slicePlaying, setSlicePlaying] = useState([true, true, true, true]);
-
-  // Randomize all 4 slices independently across 10 outfits
-  const randomizeAll = () => {
-    setSliceModels([
-      Math.floor(Math.random() * models.length),
-      Math.floor(Math.random() * models.length),
-      Math.floor(Math.random() * models.length),
-      Math.floor(Math.random() * models.length)
-    ]);
-  };
-
-  // Auto-play interval effect for active running slices with randomized selection (1.30 seconds)
+  // Every slice reshuffles to a different look on its own, every 1.3 seconds.
   useEffect(() => {
-    const hasAnyPlaying = slicePlaying.some((p) => p);
-    if (!hasAnyPlaying) return;
-
     const interval = setInterval(() => {
-      setSliceModels((prev) => {
-        return prev.map((currentIdx, sliceIdx) => {
-          if (slicePlaying[sliceIdx]) {
-            let nextIdx = Math.floor(Math.random() * models.length);
-            if (nextIdx === currentIdx) {
-              nextIdx = (currentIdx + 1) % models.length;
-            }
-            return nextIdx;
-          }
-          return currentIdx;
-        });
-      });
+      setSliceModels((prev) => prev.map((currentIdx) => {
+        const nextIdx = Math.floor(Math.random() * models.length);
+        return nextIdx === currentIdx ? (currentIdx + 1) % models.length : nextIdx;
+      }));
     }, 1300);
 
     return () => clearInterval(interval);
-  }, [slicePlaying, models.length]);
+  }, [models.length]);
 
-  // Toggle play/stop on a specific slice
-  const togglePlaySlice = (sliceIndex, e) => {
-    e?.stopPropagation();
-    setSlicePlaying((prev) => {
-      const next = [...prev];
-      next[sliceIndex] = !next[sliceIndex];
-      return next;
-    });
-  };
 
-  // Toggle master play/pause for all 4 slices together
-  const togglePlayAll = () => {
-    const allPlaying = slicePlaying.every((p) => p);
-    setSlicePlaying([!allPlaying, !allPlaying, !allPlaying, !allPlaying]);
-  };
 
   // Click on a single slice to cycle to a random new look
   const cycleSingleSlice = (sliceIndex) => {
@@ -174,7 +135,6 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
     '☺'
   ];
 
-  const isAllPlaying = slicePlaying.every((p) => p);
 
   const handleAction = () => {
     if (onEnterWebsite) {
@@ -184,26 +144,26 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
     }
   };
 
-  // Dynamic Scale-Down on Scroll: Starts at full 1.0 size, smoothly scales down to 0.65x as user scrolls down
+  // Full size at the top, easing down to 0.65x as the hero scrolls away.
   const titleScale = Math.max(1 - scrollProgress * 0.35, 0.65);
   const titleOpacity = Math.max(1 - scrollProgress * 0.2, 0.8);
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative w-full bg-[#FAF8F5] text-[#2D231E] min-h-[145vh] pt-2 pb-12 px-4 sm:px-8 lg:px-12 flex flex-col justify-between select-none border-b border-[#D9D3C7]"
     >
       
-      {/* 1. Header Title: Positioned high near top navbar, scales down smoothly as user scrolls */}
-      <div 
-        className="w-full text-center z-0 pointer-events-none select-none pt-1 sm:pt-3 -mb-4 sm:-mb-6 md:-mb-8 relative origin-top"
+      {/* The masthead reveals once, then pins and scales down as the page scrolls. */}
+      <div
+        className="w-full text-center z-0 pointer-events-none select-none pt-1 sm:pt-3 -mb-4 sm:-mb-6 md:-mb-8 relative origin-top home-masthead"
         style={{
           transform: `translateY(${stickyOffset}px) scale(${titleScale})`,
           opacity: titleOpacity,
           transition: 'transform 0.04s ease-out, opacity 0.04s ease-out',
         }}
       >
-        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10.5rem] font-black tracking-tight uppercase leading-none inline-block whitespace-nowrap drop-shadow-sm font-sans">
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10.5rem] font-black tracking-tight uppercase leading-none inline-block whitespace-nowrap drop-shadow-sm font-sans home-masthead-title">
           <span className="text-[#2D5A27]">MATCH</span>
           <span className="text-[#BC5A36]">A</span>
         </h1>
@@ -244,19 +204,6 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
                 alt="MatchA Head Slice" 
                 className="absolute inset-x-0 w-full h-[400%] top-0 object-cover object-center pointer-events-none transition-all duration-500 group-hover:scale-102"
               />
-              {/* Slice 1 Play / Stop Button */}
-              <button 
-                onClick={(e) => togglePlaySlice(0, e)}
-                title={slicePlaying[0] ? 'Stop Randomizing Slice 1' : 'Auto-Randomize Slice 1'}
-                aria-label="Toggle Slice 1 Auto-run"
-                className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold shadow-md transition-all z-20 cursor-pointer ${
-                  slicePlaying[0]
-                    ? 'bg-[#BC5A36] text-white border-[#A64C2B] animate-pulse ring-2 ring-[#BC5A36]/40'
-                    : 'bg-white/90 text-[#2D231E] border-[#D9D3C7] hover:bg-[#BC5A36] hover:text-white'
-                }`}
-              >
-                {slicePlaying[0] ? '⏸' : '▷'}
-              </button>
             </div>
 
             {/* Slice 2: Torso & Apparel (25% - 50%) */}
@@ -270,19 +217,6 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
                 alt="MatchA Torso Slice" 
                 className="absolute inset-x-0 w-full h-[400%] -top-full object-cover object-center pointer-events-none transition-all duration-500 group-hover:scale-102"
               />
-              {/* Slice 2 Play / Stop Button */}
-              <button 
-                onClick={(e) => togglePlaySlice(1, e)}
-                title={slicePlaying[1] ? 'Stop Randomizing Slice 2' : 'Auto-Randomize Slice 2'}
-                aria-label="Toggle Slice 2 Auto-run"
-                className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold shadow-md transition-all z-20 cursor-pointer ${
-                  slicePlaying[1]
-                    ? 'bg-[#BC5A36] text-white border-[#A64C2B] animate-pulse ring-2 ring-[#BC5A36]/40'
-                    : 'bg-white/90 text-[#2D231E] border-[#D9D3C7] hover:bg-[#BC5A36] hover:text-white'
-                }`}
-              >
-                {slicePlaying[1] ? '⏸' : '▷'}
-              </button>
             </div>
 
             {/* Slice 3: Lower Body & Pants/Skirt (50% - 75%) */}
@@ -296,19 +230,6 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
                 alt="MatchA Pants/Skirt Slice" 
                 className="absolute inset-x-0 w-full h-[400%] top-[-200%] object-cover object-center pointer-events-none transition-all duration-500 group-hover:scale-102"
               />
-              {/* Slice 3 Play / Stop Button */}
-              <button 
-                onClick={(e) => togglePlaySlice(2, e)}
-                title={slicePlaying[2] ? 'Stop Randomizing Slice 3' : 'Auto-Randomize Slice 3'}
-                aria-label="Toggle Slice 3 Auto-run"
-                className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold shadow-md transition-all z-20 cursor-pointer ${
-                  slicePlaying[2]
-                    ? 'bg-[#BC5A36] text-white border-[#A64C2B] animate-pulse ring-2 ring-[#BC5A36]/40'
-                    : 'bg-white/90 text-[#2D231E] border-[#D9D3C7] hover:bg-[#BC5A36] hover:text-white'
-                }`}
-              >
-                {slicePlaying[2] ? '⏸' : '▷'}
-              </button>
             </div>
 
             {/* Slice 4: Sneakers & Studio Floor (75% - 100%) */}
@@ -322,19 +243,6 @@ export default function BrandHero({ onShopNow, onEnterWebsite }) {
                 alt="MatchA Footwear Slice" 
                 className="absolute inset-x-0 w-full h-[400%] top-[-300%] object-cover object-center pointer-events-none transition-all duration-500 group-hover:scale-102"
               />
-              {/* Slice 4 Play / Stop Button */}
-              <button 
-                onClick={(e) => togglePlaySlice(3, e)}
-                title={slicePlaying[3] ? 'Stop Randomizing Slice 4' : 'Auto-Randomize Slice 4'}
-                aria-label="Toggle Slice 4 Auto-run"
-                className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold shadow-md transition-all z-20 cursor-pointer ${
-                  slicePlaying[3]
-                    ? 'bg-[#BC5A36] text-white border-[#A64C2B] animate-pulse ring-2 ring-[#BC5A36]/40'
-                    : 'bg-white/90 text-[#2D231E] border-[#D9D3C7] hover:bg-[#BC5A36] hover:text-white'
-                }`}
-              >
-                {slicePlaying[3] ? '⏸' : '▷'}
-              </button>
             </div>
 
           </div>

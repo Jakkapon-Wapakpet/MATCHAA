@@ -65,6 +65,9 @@ out/
 .env.production.local
 backend/.env
 backend/.env.*
+# ...but the template carries no secrets and documents what is required.
+!.env.example
+!backend/.env.example
 backend/.env.local
 backend/.env.production
 frontend/.env
@@ -179,4 +182,10 @@ ENV/
 .diagram-design
 *.drawio.bkp
 *.drawio.dtmp
+
+# 15. Lookbook Authentic Flatlay Assets
+frontend/public/images/lookbook_flatlay/*
+!frontend/public/images/lookbook_flatlay/.gitkeep
+
+
 

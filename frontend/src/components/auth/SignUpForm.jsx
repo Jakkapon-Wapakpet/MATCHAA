@@ -33,8 +33,8 @@ export default function SignupForm({ onBackToStore }) {
     e.preventDefault();
     setError('');
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters.');
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters.');
       return;
     }
 
@@ -58,21 +58,32 @@ export default function SignupForm({ onBackToStore }) {
     };
 
     try {
-      await api.createUser({
+      // The account has to exist on the server before we call anyone signed in;
+      // a failure here is a failure to register, not a warning to swallow.
+      const res = await api.register({
         name: newUser.name,
         email: newUser.email,
-        password: newUser.password,
-        role: 'Member',
-        tier: 'VIP Connoisseur'
+        password: newUser.password
       });
+      const account = res.data || {};
+      login(
+        {
+          id: account._id,
+          name: account.name || newUser.name,
+          email: account.email || newUser.email,
+          role: account.role || 'Member',
+          tier: account.tier
+        },
+        true,
+        res.token
+      );
+      showToast(`Account created for ${newUser.name}! Welcome to VIP Archive 🎉`);
+      navigate('/');
     } catch (err) {
-      console.warn('Backend user creation notice:', err.message);
+      setError(err.message || 'Could not create your account. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-    login(newUser);
-    showToast(`Account created for ${newUser.name}! Welcome to VIP Archive 🎉`);
-    navigate('/');
   };
 
   return (
@@ -91,13 +102,12 @@ export default function SignupForm({ onBackToStore }) {
             First Name *
           </label>
           <div className="relative">
-            <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B5E55]" />
+            <User size={16} className="absolute left-3.5 inset-y-0 my-auto text-[#6B5E55]" />
             <input
               type="text"
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
-              placeholder="e.g. Alex"
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-matcha-border focus:border-matcha-primary focus:ring-2 focus:ring-matcha-primary/20 outline-none text-xs text-matcha-text bg-matcha-bg/50 transition-all font-mono"
               required
             />
@@ -109,13 +119,12 @@ export default function SignupForm({ onBackToStore }) {
             Last Name *
           </label>
           <div className="relative">
-            <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B5E55]" />
+            <User size={16} className="absolute left-3.5 inset-y-0 my-auto text-[#6B5E55]" />
             <input
               type="text"
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              placeholder="e.g. Collector"
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-matcha-border focus:border-matcha-primary focus:ring-2 focus:ring-matcha-primary/20 outline-none text-xs text-matcha-text bg-matcha-bg/50 transition-all font-mono"
               required
             />
@@ -129,13 +138,13 @@ export default function SignupForm({ onBackToStore }) {
           Email Address *
         </label>
         <div className="relative">
-          <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B5E55]" />
+          <Mail size={16} className="absolute left-3.5 inset-y-0 my-auto text-[#6B5E55]" />
           <input
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="your.email@matcha.vip"
+            placeholder="name@domain.com"
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-matcha-border focus:border-matcha-primary focus:ring-2 focus:ring-matcha-primary/20 outline-none text-xs text-matcha-text bg-matcha-bg/50 transition-all font-mono"
             required
           />
@@ -148,13 +157,13 @@ export default function SignupForm({ onBackToStore }) {
           Password *
         </label>
         <div className="relative">
-          <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B5E55]" />
+          <Lock size={16} className="absolute left-3.5 inset-y-0 my-auto text-[#6B5E55]" />
           <input
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
-            placeholder="At least 6 characters"
+            placeholder="At least 8 characters"
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-matcha-border focus:border-matcha-primary focus:ring-2 focus:ring-matcha-primary/20 outline-none text-xs text-matcha-text bg-matcha-bg/50 transition-all font-mono"
             required
           />
@@ -167,7 +176,7 @@ export default function SignupForm({ onBackToStore }) {
           Password Confirmation *
         </label>
         <div className="relative">
-          <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B5E55]" />
+          <Lock size={16} className="absolute left-3.5 inset-y-0 my-auto text-[#6B5E55]" />
           <input
             type="password"
             name="confirmPassword"

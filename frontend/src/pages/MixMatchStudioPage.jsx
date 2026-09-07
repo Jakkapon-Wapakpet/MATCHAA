@@ -18,6 +18,7 @@ import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { handleImageError } from '../utils/imageFallback';
 import { computeOutfitSynergy } from '../utils/fashionTheory';
+import useChangeMotion from '../hooks/useChangeMotion';
 
 // Curated Editorial Presets (Complete 4-Piece Head-to-Toe Looks)
 const OUTFIT_PRESETS = [
@@ -99,6 +100,8 @@ export default function MixMatchStudioPage() {
   const [activeSlotTab, setActiveSlotTab] = useState('tops'); // 'tops' | 'bottoms' | 'footwear' | 'accessories'
   const [activePresetId, setActivePresetId] = useState('PRESET-01');
   const [justAddedBundle, setJustAddedBundle] = useState(false);
+  const outfitMotionRef = useChangeMotion([selectedTop?.id, selectedBottom?.id, selectedFootwear?.id, selectedAccessory?.id].join('|'), 'outfit');
+  const pickerMotionRef = useChangeMotion(activeSlotTab, 'grid');
 
   // Synchronize Left Column and Right Column heights on desktop (>=1024px)
   const leftColRef = useRef(null);
@@ -204,14 +207,14 @@ export default function MixMatchStudioPage() {
         {/* 1. HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#D9D3C7]">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E2ECE9] border border-[#2D5A27]/20 text-[#2D5A27] text-xs font-mono font-bold uppercase tracking-wider mb-2">
+            <div data-enter className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E2ECE9] border border-[#2D5A27]/20 text-[#2D5A27] text-xs font-mono font-bold uppercase tracking-wider mb-2">
               <Sparkles size={14} />
               <span>Head-to-Toe 4-Slot Wardrobe Canvas</span>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight font-serif">
+            <h1 data-enter="wipe" style={{ '--enter-delay': '90ms' }} className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight font-serif">
               Mix & Match Fashion Studio
             </h1>
-            <p className="text-[#6B5E55] text-xs sm:text-sm mt-1">
+            <p data-enter style={{ '--enter-delay': '190ms' }} className="text-[#6B5E55] text-xs sm:text-sm mt-1">
               จับคู่ลุคสมบูรณ์แบบ เสื้อ • กางเกง • รองเท้า • เครื่องประดับ พร้อมระบบคำนวณ Color Harmony ตามทฤษฎีสากล
             </p>
           </div>
@@ -304,11 +307,12 @@ export default function MixMatchStudioPage() {
             </div>
 
             {/* Visual Canvas Stack (4 Slots) */}
-            <div className="space-y-2.5 bg-[#FAF8F5] p-3.5 rounded-2xl border border-[#D9D3C7]">
+            <div ref={outfitMotionRef} className="space-y-2.5 bg-[#FAF8F5] p-3.5 rounded-2xl border border-[#D9D3C7]">
               
               {/* Slot 1: Top / Upper Body */}
               <div 
                 onClick={() => setActiveSlotTab('tops')}
+                data-motion-slot="tops" data-motion-item={selectedTop?.id}
                 className={`p-2.5 bg-white rounded-xl border-2 transition-all cursor-pointer flex items-center gap-3 ${
                   activeSlotTab === 'tops' ? 'border-[#2D5A27] ring-2 ring-[#2D5A27]/20 shadow-sm' : 'border-[#D9D3C7]'
                 }`}
@@ -336,6 +340,7 @@ export default function MixMatchStudioPage() {
               {/* Slot 2: Bottom / Lower Body */}
               <div 
                 onClick={() => setActiveSlotTab('bottoms')}
+                data-motion-slot="bottoms" data-motion-item={selectedBottom?.id}
                 className={`p-2.5 bg-white rounded-xl border-2 transition-all cursor-pointer flex items-center gap-3 ${
                   activeSlotTab === 'bottoms' ? 'border-[#2D5A27] ring-2 ring-[#2D5A27]/20 shadow-sm' : 'border-[#D9D3C7]'
                 }`}
@@ -363,6 +368,7 @@ export default function MixMatchStudioPage() {
               {/* Slot 3: Footwear Anchor */}
               <div 
                 onClick={() => setActiveSlotTab('footwear')}
+                data-motion-slot="footwear" data-motion-item={selectedFootwear?.id}
                 className={`p-2.5 bg-white rounded-xl border-2 transition-all cursor-pointer flex items-center gap-3 ${
                   activeSlotTab === 'footwear' ? 'border-[#2D5A27] ring-2 ring-[#2D5A27]/20 shadow-sm' : 'border-[#D9D3C7]'
                 }`}
@@ -390,6 +396,7 @@ export default function MixMatchStudioPage() {
               {/* Slot 4: Accent Accessories */}
               <div 
                 onClick={() => setActiveSlotTab('accessories')}
+                data-motion-slot="accessories" data-motion-item={selectedAccessory?.id}
                 className={`p-2.5 bg-white rounded-xl border-2 transition-all cursor-pointer flex items-center gap-3 ${
                   activeSlotTab === 'accessories' ? 'border-[#2D5A27] ring-2 ring-[#2D5A27]/20 shadow-sm' : 'border-[#D9D3C7]'
                 }`}
@@ -594,6 +601,7 @@ export default function MixMatchStudioPage() {
             {/* Grid of Items for the Active Slot (Fills Available Height to Match Left Column) */}
             <div 
               data-lenis-prevent="true"
+              ref={pickerMotionRef}
               onWheel={(e) => e.stopPropagation()}
               className="grid grid-cols-2 sm:grid-cols-3 gap-4 flex-1 min-h-120 lg:min-h-0 overflow-y-auto overscroll-contain pr-2"
             >

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useChangeMotion from '../hooks/useChangeMotion';
 import { 
   Sparkles, 
   CheckCircle2, 
@@ -166,6 +167,7 @@ export default function PersonalColorPage() {
   });
   const [isScanning, setIsScanning] = useState(false);
   const [selectedSeasonTab, setSelectedSeasonTab] = useState('Autumn');
+  const questionMotionRef = useChangeMotion(`${activeTab}-${currentStep}-${diagnosedSeason}-${isScanning}`);
 
   // Handle Option Click
   const handleSelectOption = (questionId, option) => {
@@ -231,14 +233,14 @@ export default function PersonalColorPage() {
 
         {/* 1. HERO HEADER: Personal Color Studio */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E2ECE9] border border-[#2D5A27]/20 text-[#2D5A27] text-xs font-mono font-bold uppercase tracking-wider">
+          <div data-enter className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E2ECE9] border border-[#2D5A27]/20 text-[#2D5A27] text-xs font-mono font-bold uppercase tracking-wider">
             <Sparkles size={14} />
             <span>Artisan Personal Color Lab & Styling Science</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight font-serif">
+          <h1 data-enter="wipe" style={{ '--enter-delay': '90ms' }} className="text-3xl sm:text-5xl font-black uppercase text-[#2D231E] tracking-tight font-serif">
             ค้นหาโทนสีผิวประจำตัว 4 ฤดูกาล
           </h1>
-          <p className="text-[#6B5E55] text-sm sm:text-base leading-relaxed">
+          <p data-enter style={{ '--enter-delay': '190ms' }} className="text-[#6B5E55] text-sm sm:text-base leading-relaxed">
             เลือกใส่เสื้อผ้าที่ขับออร่าของคุณด้วย <strong>ทฤษฎี Personal Color สากล</strong> จำแนกตาม 4 ฤดู ช่วยให้ทุกชุดที่คุณสวมใส่เสริมบุคลิกและสะท้อนเสน่ห์ที่เป็นเอกลักษณ์
           </p>
 
@@ -291,7 +293,7 @@ export default function PersonalColorPage() {
                 </div>
 
                 {/* Current Question */}
-                <div className="space-y-6">
+                <div ref={questionMotionRef} className="space-y-6">
                   <div className="space-y-2">
                     <span className="text-[11px] font-mono font-bold uppercase text-[#BC5A36] tracking-wider flex items-center gap-1.5">
                       {QUIZ_QUESTIONS[currentStep].icon}
