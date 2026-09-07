@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 
-export default function BrandHero({ onShopNow, onEnterWebsite, motionEnabled = true }) {
+export default function BrandHero({ onShopNow, onEnterWebsite }) {
   // Studio model references for the four independently shuffled slices.
   const models = [
     {
@@ -76,7 +76,7 @@ export default function BrandHero({ onShopNow, onEnterWebsite, motionEnabled = t
   // Auto-play interval effect for active running slices with randomized selection (1.30 seconds)
   useEffect(() => {
     const hasAnyPlaying = slicePlaying.some((p) => p);
-    if (!hasAnyPlaying || !motionEnabled) return;
+    if (!hasAnyPlaying) return;
 
     const interval = setInterval(() => {
       setSliceModels((prev) => {
@@ -94,7 +94,7 @@ export default function BrandHero({ onShopNow, onEnterWebsite, motionEnabled = t
     }, 1300);
 
     return () => clearInterval(interval);
-  }, [slicePlaying, models.length, motionEnabled]);
+  }, [slicePlaying, models.length]);
 
 
 

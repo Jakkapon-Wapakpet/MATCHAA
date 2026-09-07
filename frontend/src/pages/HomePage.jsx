@@ -30,7 +30,7 @@ export default function HomePage({
       
       {/* 1. MASTER HERO: Editorial 4-Slice Interactive Lookbook Cover */}
       <section id="brand-hero">
-        <BrandHero motionEnabled={!prefersReducedMotion} onShopNow={handleScrollToFit} />
+        <BrandHero onShopNow={handleScrollToFit} />
       </section>
 
       {/* 2. CHOOSE YOUR SILHOUETTE: 2K Studio Model with 6 Borderless Floating Cards */}

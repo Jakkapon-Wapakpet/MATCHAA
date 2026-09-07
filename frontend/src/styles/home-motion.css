@@ -26,12 +26,10 @@
   from { clip-path: inset(5% 2%); }
   to { clip-path: inset(0); }
 }
-.home-page[data-motion="reduced"] *, .home-page[data-motion="reduced"] *::before, .home-page[data-motion="reduced"] *::after {
-  animation: none !important;
-  transition: none !important;
-  scroll-behavior: auto !important;
-}
-.home-page[data-motion="reduced"] .preserve-3d { transform: none !important; }
+/* Reduced motion: skip the entrance choreography only. Hover feedback, colour
+   fades and the tilt stay — useHomeMotion already withholds .home-entered, so
+   the masthead is the one animation that still needs switching off here. */
+.home-page[data-motion="reduced"] .home-masthead-title { animation: none; }
 @media (hover: none) {
   .home-page .preserve-3d { transform: none !important; }
 }
