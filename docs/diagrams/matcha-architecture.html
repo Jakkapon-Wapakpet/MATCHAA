@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MatchA · System Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #FAF8F5;
+      --color-paper-2: #F4F1EA;
+      --color-ink: #2D231E;
+      --color-muted: #6B5E55;
+      --color-soft: #8C7E74;
+      --color-rule: rgba(45,35,30,0.12);
+      --color-rule-solid: #D9D3C7;
+      --color-accent: #2D5A27;
+      --color-accent-tint: rgba(45,90,39,0.08);
+      --color-highlight: #BC5A36;
+      --color-secondary: #D0DEC6;
+      --font-sans: 'Geist', system-ui, sans-serif;
+      --font-serif: 'Instrument Serif', serif;
+      --font-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      min-height: 100vh;
+      padding: 3rem 2rem;
+      color: var(--color-ink);
+    }
+    .container { max-width: 1160px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 3.5vw + 1rem, 2.75rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--color-muted);
+      max-width: 65ch;
+    }
+    .diagram-container {
+      background: var(--color-paper-2);
+      border-radius: 12px;
+      border: 1px solid var(--color-rule-solid);
+      padding: 1.5rem;
+      overflow-x: auto;
+      box-shadow: 0 4px 20px -2px rgba(45,35,30,0.05);
+    }
+    svg { width: 100%; min-width: 1000px; display: block; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 1.75rem;
+    }
+    @media (max-width: 860px) { .cards { grid-template-columns: 1fr; } }
+    .card {
+      background: #FFFFFF;
+      border-radius: 8px;
+      border: 1px solid var(--color-rule-solid);
+      padding: 1.25rem;
+    }
+    .card .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 0.35rem;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--color-rule);
+    }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.accent { background: var(--color-accent); }
+    .card-dot.highlight { background: var(--color-highlight); }
+    .card-dot.muted { background: var(--color-muted); }
+    .card h3 { font-size: 0.95rem; font-weight: 600; color: var(--color-ink); }
+    .card p { font-size: 0.8125rem; line-height: 1.55; color: var(--color-muted); }
+    .footer {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--color-rule);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      color: var(--color-soft);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <p class="header-eyebrow">MatchA Platform · Architecture</p>
+      <h1>MatchA System Architecture</h1>
+      <p class="subtitle">Modern Personal Color Fashion E-Commerce stack: Vite React 19 Frontend with Tailwind design system, Node.js Express API Gateway, and Cloud Data Store.</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1040 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="matcha-arch-title matcha-arch-desc">
+        <title id="matcha-arch-title">MatchA System Architecture Diagram</title>
+        <desc id="matcha-arch-desc">Architecture diagram of the MatchA platform illustrating the client tier, API gateway, core business modules, and persistence layer.</desc>
+
+        <defs>
+          <pattern id="grid-dots" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="rgba(45,35,30,0.06)"/>
+          </pattern>
+          <marker id="arrow-default" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#6B5E55"/>
+          </marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#2D5A27"/>
+          </marker>
+          <marker id="arrow-highlight" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#BC5A36"/>
+          </marker>
+        </defs>
+
+        <!-- Canvas Background -->
+        <rect width="100%" height="100%" fill="#FAF8F5"/>
+        <rect width="100%" height="100%" fill="url(#grid-dots)"/>
+
+        <!-- ================= TIER BOUNDARIES (ZONES) ================= -->
+        <!-- Zone 1: Presentation Tier -->
+        <rect x="40" y="56" width="230" height="390" rx="10" fill="#F4F1EA" stroke="#D9D3C7" stroke-width="1"/>
+        <rect x="56" y="48" width="130" height="18" rx="3" fill="#FAF8F5" stroke="#D9D3C7" stroke-width="0.8"/>
+        <text x="121" y="60" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle" letter-spacing="0.12em">1. CLIENT LAYER</text>
+
+        <!-- Zone 2: Application Tier -->
+        <rect x="340" y="56" width="370" height="390" rx="10" fill="#F4F1EA" stroke="#D9D3C7" stroke-width="1"/>
+        <rect x="356" y="48" width="170" height="18" rx="3" fill="#FAF8F5" stroke="#D9D3C7" stroke-width="0.8"/>
+        <text x="441" y="60" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle" letter-spacing="0.12em">2. APPLICATION GATEWAY</text>
+
+        <!-- Zone 3: Data Tier -->
+        <rect x="780" y="56" width="220" height="390" rx="10" fill="#F4F1EA" stroke="#D9D3C7" stroke-width="1"/>
+        <rect x="796" y="48" width="130" height="18" rx="3" fill="#FAF8F5" stroke="#D9D3C7" stroke-width="0.8"/>
+        <text x="861" y="60" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle" letter-spacing="0.12em">3. DATA &amp; STORAGE</text>
+
+        <!-- ================= CONNECTORS (BEHIND BOXES) ================= -->
+        <!-- Client -> Express Server Core -->
+        <line x1="240" y1="128" x2="368" y2="128" stroke="#2D5A27" stroke-width="1.5" marker-end="url(#arrow-accent)"/>
+        <!-- Return Client (Cached/State) -->
+        <line x1="368" y1="148" x2="240" y2="148" stroke="#6B5E55" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-default)"/>
+
+        <!-- Express Core -> Personal Color Filter Engine -->
+        <path d="M 520,158 V 200" fill="none" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#arrow-default)"/>
+
+        <!-- Express Core -> Order & Checkout Engine -->
+        <path d="M 440,158 V 290 Q 440,298 448,298 H 472" fill="none" stroke="#BC5A36" stroke-width="1.4" marker-end="url(#arrow-highlight)"/>
+
+        <!-- Express Core -> Admin Inventory Controller -->
+        <path d="M 400,158 V 378 Q 400,386 408,386 H 472" fill="none" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#arrow-default)"/>
+
+        <!-- Filter Engine -> Catalog Data Store -->
+        <path d="M 680,228 H 740 Q 748,228 748,208 V 140 Q 748,132 756,132 H 808" fill="none" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#arrow-default)"/>
+
+        <!-- Order Engine -> Orders Database -->
+        <path d="M 680,314 H 748 Q 756,314 756,290 V 238 Q 756,230 764,230 H 808" fill="none" stroke="#BC5A36" stroke-width="1.4" marker-end="url(#arrow-highlight)"/>
+
+        <!-- Admin Inventory -> Cloud Storage / CDN Assets -->
+        <path d="M 680,396 H 756 Q 764,396 764,340 Q 764,330 772,330 H 808" fill="none" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#arrow-default)"/>
+
+        <!-- ================= LABELS ON CONNECTORS ================= -->
+        <rect x="272" y="112" width="64" height="14" rx="2" fill="#FAF8F5"/>
+        <text x="304" y="122" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="500" text-anchor="middle">REST / JSON</text>
+
+        <rect x="272" y="152" width="64" height="14" rx="2" fill="#FAF8F5"/>
+        <text x="304" y="162" fill="#6B5E55" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">HYDRATE</text>
+
+        <!-- ================= TIER 1: CLIENT NODES ================= -->
+        <!-- Node: React 19 Frontend -->
+        <rect x="64" y="96" width="176" height="64" rx="6" fill="#FFFFFF" stroke="#2D5A27" stroke-width="1.5"/>
+        <rect x="72" y="104" width="48" height="14" rx="2" fill="rgba(45,90,39,0.1)"/>
+        <text x="96" y="114" fill="#2D5A27" font-size="7" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">PRIMARY</text>
+        <text x="72" y="132" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">MatchA Web App</text>
+        <text x="72" y="148" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">React 19 · Vite · Tailwind</text>
+
+        <!-- Node: Lookbook & Swatch Customizer -->
+        <rect x="64" y="190" width="176" height="56" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+        <text x="72" y="212" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Color Customizer</text>
+        <text x="72" y="228" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Swatches · Mix&amp;Match UI</text>
+
+        <!-- Node: Cart & VIP Member Hub -->
+        <rect x="64" y="274" width="176" height="56" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+        <text x="72" y="296" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Cart &amp; Member Hub</text>
+        <text x="72" y="312" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">VIP Tier · PromptPay QR</text>
+
+        <!-- Node: Admin Command Center -->
+        <rect x="64" y="358" width="176" height="56" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+        <text x="72" y="380" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Admin Dashboard</text>
+        <text x="72" y="396" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Inventory &amp; Analytics</text>
+
+        <!-- ================= TIER 2: APPLICATION GATEWAY NODES ================= -->
+        <!-- Node: Node.js / Express Server (Focal Point) -->
+        <rect x="368" y="96" width="312" height="62" rx="6" fill="rgba(45,90,39,0.08)" stroke="#2D5A27" stroke-width="2"/>
+        <rect x="378" y="104" width="58" height="14" rx="2" fill="#2D5A27"/>
+        <text x="407" y="114" fill="#FAF8F5" font-size="7" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">API ROOT</text>
+        <text x="378" y="132" fill="#2D231E" font-size="13" font-family="'Geist', sans-serif" font-weight="600">Express.js API Gateway (:5000)</text>
+        <text x="378" y="148" fill="#2D5A27" font-size="9" font-family="'Geist Mono', monospace">JWT Auth · CORS · Request Logger · Route Guards</text>
+
+        <!-- Module: Personal Color Engine -->
+        <rect x="472" y="200" width="208" height="58" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+        <text x="484" y="222" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Personal Color Engine</text>
+        <text x="484" y="238" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Spring/Summer/Autumn/Winter</text>
+        <text x="484" y="249" fill="#8C7E74" font-size="8" font-family="'Geist Mono', monospace">/api/products?season=...&amp;tone=...</text>
+
+        <!-- Module: Orders & Payments Controller (Focal 2) -->
+        <rect x="472" y="284" width="208" height="60" rx="6" fill="#FFFFFF" stroke="#BC5A36" stroke-width="1.5"/>
+        <rect x="484" y="292" width="54" height="13" rx="2" fill="rgba(188,90,54,0.12)"/>
+        <text x="511" y="301" fill="#BC5A36" font-size="7" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">CHECKOUT</text>
+        <text x="484" y="321" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Order &amp; Payment Service</text>
+        <text x="484" y="335" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">PromptPay QR · VIP 15% Auto-Discount</text>
+
+        <!-- Module: Inventory CRUD & Analytics -->
+        <rect x="472" y="368" width="208" height="58" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+        <text x="484" y="390" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Inventory &amp; Analytics API</text>
+        <text x="484" y="406" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">CRUD (+10/-5) · Revenue Reports</text>
+        <text x="484" y="418" fill="#8C7E74" font-size="8" font-family="'Geist Mono', monospace">/api/admin/inventory · /api/categories</text>
+
+        <!-- ================= TIER 3: DATA & STORAGE NODES ================= -->
+        <!-- Node: Products Catalog -->
+        <rect x="808" y="104" width="168" height="58" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+        <text x="820" y="126" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Products Catalog</text>
+        <text x="820" y="142" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Garments &amp; Swatches DB</text>
+        <text x="820" y="153" fill="#8C7E74" font-size="8" font-family="'Geist Mono', monospace">Tops · Bottoms · Bags · Accessories</text>
+
+        <!-- Node: Orders & Customers DB -->
+        <rect x="808" y="200" width="168" height="58" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+        <text x="820" y="222" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Orders &amp; Users DB</text>
+        <text x="820" y="238" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Order History · VIP Ledger</text>
+        <text x="820" y="249" fill="#8C7E74" font-size="8" font-family="'Geist Mono', monospace">Transactions &amp; Membership</text>
+
+        <!-- Node: Static Assets Storage -->
+        <rect x="808" y="296" width="168" height="58" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+        <text x="820" y="318" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">CDN &amp; Cloud Assets</text>
+        <text x="820" y="334" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Lookbook Images &amp; Media</text>
+        <text x="820" y="345" fill="#8C7E74" font-size="8" font-family="'Geist Mono', monospace">Optimized WebP / SVG Icons</text>
+
+        <!-- ================= LEGEND STRIP (BOTTOM 60PX) ================= -->
+        <line x1="40" y1="480" x2="1000" y2="480" stroke="#D9D3C7" stroke-width="0.8"/>
+        
+        <rect x="40" y="496" width="12" height="12" rx="2" fill="#2D5A27"/>
+        <text x="58" y="506" fill="#2D231E" font-size="9" font-family="'Geist Mono', monospace">Primary Brand Core</text>
+
+        <rect x="220" y="496" width="12" height="12" rx="2" fill="#BC5A36"/>
+        <text x="238" y="506" fill="#2D231E" font-size="9" font-family="'Geist Mono', monospace">Checkout / Critical Path</text>
+
+        <line x1="420" y1="502" x2="446" y2="502" stroke="#6B5E55" stroke-width="1.5" marker-end="url(#arrow-default)"/>
+        <text x="454" y="506" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Synchronous REST API</text>
+
+        <line x1="640" y1="502" x2="666" y2="502" stroke="#6B5E55" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-default)"/>
+        <text x="674" y="506" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Return State / Static Cache</text>
+      </svg>
+    </div>
+
+    <!-- Editorial Summary Cards -->
+    <div class="cards">
+      <div class="card">
+        <div class="eyebrow">Front-of-House</div>
+        <div class="card-header">
+          <div class="card-dot accent"></div>
+          <h3>Client Layer</h3>
+        </div>
+        <p>Built with React 19 and Tailwind CSS. Employs Context API for client-side state across shopping cart, color tone toggles, and VIP membership authentication.</p>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Routing &amp; Security</div>
+        <div class="card-header">
+          <div class="card-dot highlight"></div>
+          <h3>API Gateway Core</h3>
+        </div>
+        <p>Express REST service powering catalog queries, personal color seasonal filtering, automated VIP discount tier calculation (15%), and PromptPay QR payments.</p>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Persistence</div>
+        <div class="card-header">
+          <div class="card-dot muted"></div>
+          <h3>Data &amp; Asset Stores</h3>
+        </div>
+        <p>Structured product schemas mapping SKU variations, sizes, hex codes, stock volumes, and customer transactions with Cloudflare-accelerated image lookbooks.</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>MatchA Platform Specifications v1.0</span>
+      <span>Designed with diagram-design · Brand Skin: MatchA Studio</span>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MatchA · Database Schema (ERD)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #FAF8F5;
+      --color-paper-2: #F4F1EA;
+      --color-ink: #2D231E;
+      --color-muted: #6B5E55;
+      --color-soft: #8C7E74;
+      --color-rule: rgba(45,35,30,0.12);
+      --color-rule-solid: #D9D3C7;
+      --color-accent: #2D5A27;
+      --color-accent-tint: rgba(45,90,39,0.08);
+      --color-highlight: #BC5A36;
+      --color-secondary: #D0DEC6;
+      --font-sans: 'Geist', system-ui, sans-serif;
+      --font-serif: 'Instrument Serif', serif;
+      --font-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      min-height: 100vh;
+      padding: 3rem 2rem;
+      color: var(--color-ink);
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 3.5vw + 1rem, 2.75rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--color-muted);
+      max-width: 68ch;
+    }
+    .diagram-container {
+      background: var(--color-paper-2);
+      border-radius: 12px;
+      border: 1px solid var(--color-rule-solid);
+      padding: 1.5rem;
+      overflow-x: auto;
+      box-shadow: 0 4px 20px -2px rgba(45,35,30,0.05);
+    }
+    svg { width: 100%; min-width: 1080px; display: block; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 1.75rem;
+    }
+    @media (max-width: 860px) { .cards { grid-template-columns: 1fr; } }
+    .card {
+      background: #FFFFFF;
+      border-radius: 8px;
+      border: 1px solid var(--color-rule-solid);
+      padding: 1.25rem;
+    }
+    .card .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 0.35rem;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--color-rule);
+    }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.accent { background: var(--color-accent); }
+    .card-dot.highlight { background: var(--color-highlight); }
+    .card-dot.muted { background: var(--color-muted); }
+    .card h3 { font-size: 0.95rem; font-weight: 600; color: var(--color-ink); }
+    .card p { font-size: 0.8125rem; line-height: 1.55; color: var(--color-muted); }
+    .footer {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--color-rule);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      color: var(--color-soft);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <p class="header-eyebrow">Data Model · Physical Schema</p>
+      <h1>MatchA Database Schema (ERD)</h1>
+      <p class="subtitle">Entity-Relationship Data Architecture: Normalized E-Commerce relational model supporting Personal Color seasonal tags, garment variants, order items, and referential constraints.</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1140 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="matcha-erd-title matcha-erd-desc">
+        <title id="matcha-erd-title">MatchA Relational Database Schema Diagram</title>
+        <desc id="matcha-erd-desc">Detailed physical database diagram of MatchA showing users, orders, order items, products, and variants with foreign key constraints.</desc>
+
+        <defs>
+          <pattern id="grid-dots-erd" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="rgba(45,35,30,0.06)"/>
+          </pattern>
+          <marker id="arrow-erd" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#6B5E55"/>
+          </marker>
+          <marker id="arrow-cascade" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#BC5A36"/>
+          </marker>
+        </defs>
+
+        <!-- Canvas Background -->
+        <rect width="100%" height="100%" fill="#FAF8F5"/>
+        <rect width="100%" height="100%" fill="url(#grid-dots-erd)"/>
+
+        <!-- ================= FOREIGN KEY CONNECTORS (BEHIND BOXES) ================= -->
+        
+        <!-- FK 1: orders.user_id -> users.id (ON DELETE RESTRICT) -->
+        <path d="M 420,148 H 365 Q 357,148 357,140 V 132 Q 357,124 349,124 H 310"
+              fill="none" stroke="#6B5E55" stroke-width="1.3" marker-end="url(#arrow-erd)"/>
+        <rect x="328" y="138" width="94" height="14" rx="2" fill="#FAF8F5"/>
+        <text x="375" y="148" fill="#6B5E55" font-size="7.5" font-family="'Geist Mono', monospace">ON DELETE RESTRICT</text>
+
+        <!-- FK 2: order_items.order_id -> orders.id (DESTRUCTIVE CASCADE - FOCAL 1) -->
+        <path d="M 420,428 H 380 Q 372,428 372,420 V 132 Q 372,124 380,124 H 420"
+              fill="none" stroke="#BC5A36" stroke-width="1.6" marker-end="url(#arrow-cascade)"/>
+        <rect x="338" y="272" width="92" height="14" rx="2" fill="#FAF8F5" stroke="#BC5A36" stroke-width="0.8"/>
+        <text x="384" y="282" fill="#BC5A36" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600">ON DELETE CASCADE</text>
+
+        <!-- FK 3: order_items.product_id -> products.id (ON DELETE RESTRICT) -->
+        <path d="M 700,452 H 742 Q 750,452 750,444 V 132 Q 750,124 758,124 H 800"
+              fill="none" stroke="#6B5E55" stroke-width="1.3" marker-end="url(#arrow-erd)"/>
+        <rect x="716" y="260" width="94" height="14" rx="2" fill="#FAF8F5"/>
+        <text x="763" y="270" fill="#6B5E55" font-size="7.5" font-family="'Geist Mono', monospace">ON DELETE RESTRICT</text>
+
+        <!-- FK 4: variants.product_id -> products.id (ON DELETE CASCADE) -->
+        <path d="M 800,428 H 776 Q 768,428 768,420 V 152 Q 768,144 776,144 H 800"
+              fill="none" stroke="#6B5E55" stroke-width="1.3" marker-end="url(#arrow-erd)"/>
+        <rect x="734" y="324" width="92" height="14" rx="2" fill="#FAF8F5"/>
+        <text x="780" y="334" fill="#6B5E55" font-size="7.5" font-family="'Geist Mono', monospace">ON DELETE CASCADE</text>
+
+        <!-- FK 5: order_items.variant_id -> variants.id (ON DELETE RESTRICT) -->
+        <path d="M 700,476 H 732 Q 740,476 740,468 V 412 Q 740,404 748,404 H 800"
+              fill="none" stroke="#6B5E55" stroke-width="1.3" marker-end="url(#arrow-erd)"/>
+        <rect x="716" y="438" width="94" height="14" rx="2" fill="#FAF8F5"/>
+        <text x="763" y="448" fill="#6B5E55" font-size="7.5" font-family="'Geist Mono', monospace">ON DELETE RESTRICT</text>
+
+
+        <!-- ================= TABLE 1: public.users ================= -->
+        <g id="table-users">
+          <rect x="50" y="80" width="260" height="200" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+          <!-- Header -->
+          <rect x="50" y="80" width="260" height="32" rx="6" fill="#F4F1EA"/>
+          <line x1="50" y1="112" x2="310" y2="112" stroke="#D9D3C7" stroke-width="1"/>
+          <text x="64" y="101" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">public.users</text>
+          <rect x="256" y="88" width="42" height="15" rx="2" fill="#D0DEC6"/>
+          <text x="277" y="99" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">TABLE</text>
+
+          <!-- Rows (24px height) -->
+          <!-- Row 0: id -->
+          <rect x="50" y="112" width="260" height="24" fill="#FFFFFF"/>
+          <text x="64" y="128" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif" font-weight="500">id</text>
+          <rect x="184" y="118" width="18" height="12" rx="2" fill="rgba(45,90,39,0.15)"/>
+          <text x="193" y="127" fill="#2D5A27" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">PK</text>
+          <text x="296" y="128" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">uuid</text>
+
+          <!-- Row 1: email -->
+          <rect x="50" y="136" width="260" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="64" y="152" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">email</text>
+          <rect x="180" y="142" width="32" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="196" y="151" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">UQ NN</text>
+          <text x="296" y="152" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(255)</text>
+
+          <!-- Row 2: password_hash -->
+          <rect x="50" y="160" width="260" height="24" fill="#FFFFFF"/>
+          <text x="64" y="176" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">password_hash</text>
+          <rect x="188" y="166" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="197" y="175" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="296" y="176" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">text</text>
+
+          <!-- Row 3: role -->
+          <rect x="50" y="184" width="260" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="64" y="200" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">role</text>
+          <rect x="188" y="190" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="197" y="199" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="296" y="200" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(20)</text>
+
+          <!-- Row 4: personal_color -->
+          <rect x="50" y="208" width="260" height="24" fill="#FFFFFF"/>
+          <text x="64" y="224" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">personal_color</text>
+          <text x="296" y="224" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(30)</text>
+
+          <!-- Row 5: is_vip -->
+          <rect x="50" y="232" width="260" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="64" y="248" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">is_vip</text>
+          <text x="296" y="248" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">boolean</text>
+
+          <!-- Row 6: created_at -->
+          <rect x="50" y="256" width="260" height="24" fill="#FFFFFF"/>
+          <text x="64" y="272" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">created_at</text>
+          <rect x="188" y="262" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="197" y="271" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="296" y="272" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">timestamptz</text>
+        </g>
+
+
+        <!-- ================= TABLE 2: public.orders ================= -->
+        <g id="table-orders">
+          <rect x="420" y="80" width="280" height="224" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+          <!-- Header -->
+          <rect x="420" y="80" width="280" height="32" rx="6" fill="#F4F1EA"/>
+          <line x1="420" y1="112" x2="700" y2="112" stroke="#D9D3C7" stroke-width="1"/>
+          <text x="434" y="101" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">public.orders</text>
+          <rect x="644" y="88" width="42" height="15" rx="2" fill="#D0DEC6"/>
+          <text x="665" y="99" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">TABLE</text>
+
+          <!-- Row 0: id -->
+          <rect x="420" y="112" width="280" height="24" fill="#FFFFFF"/>
+          <text x="434" y="128" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif" font-weight="500">id</text>
+          <rect x="584" y="118" width="18" height="12" rx="2" fill="rgba(45,90,39,0.15)"/>
+          <text x="593" y="127" fill="#2D5A27" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">PK</text>
+          <text x="686" y="128" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">uuid</text>
+
+          <!-- Row 1: user_id (FK) -->
+          <rect x="420" y="136" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="434" y="152" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">user_id</text>
+          <rect x="584" y="142" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="593" y="151" fill="#6B5E55" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">FK</text>
+          <text x="686" y="152" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">uuid</text>
+
+          <!-- Row 2: order_number -->
+          <rect x="420" y="160" width="280" height="24" fill="#FFFFFF"/>
+          <text x="434" y="176" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">order_number</text>
+          <rect x="580" y="166" width="32" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="596" y="175" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">UQ NN</text>
+          <text x="686" y="176" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(32)</text>
+
+          <!-- Row 3: subtotal -->
+          <rect x="420" y="184" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="434" y="200" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">subtotal</text>
+          <rect x="588" y="190" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="597" y="199" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="686" y="200" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">numeric(10,2)</text>
+
+          <!-- Row 4: discount -->
+          <rect x="420" y="208" width="280" height="24" fill="#FFFFFF"/>
+          <text x="434" y="224" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">discount</text>
+          <text x="686" y="224" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">numeric(10,2)</text>
+
+          <!-- Row 5: total_amount -->
+          <rect x="420" y="232" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="434" y="248" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">total_amount</text>
+          <rect x="588" y="238" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="597" y="247" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="686" y="248" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">numeric(10,2)</text>
+
+          <!-- Row 6: order_status -->
+          <rect x="420" y="256" width="280" height="24" fill="#FFFFFF"/>
+          <text x="434" y="272" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">order_status</text>
+          <rect x="588" y="262" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="597" y="271" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="686" y="272" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(30)</text>
+
+          <!-- Row 7: purchase_date -->
+          <rect x="420" y="280" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="434" y="296" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">purchase_date</text>
+          <rect x="588" y="286" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="597" y="295" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="686" y="296" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">timestamptz</text>
+        </g>
+
+
+        <!-- ================= TABLE 3: public.order_items (FOCAL 2: ACCENT TINT HEADER) ================= -->
+        <g id="table-order-items">
+          <rect x="420" y="360" width="280" height="176" rx="6" fill="#FFFFFF" stroke="#BC5A36" stroke-width="1.5"/>
+          <!-- Header (Focal tint) -->
+          <rect x="420" y="360" width="280" height="32" rx="6" fill="rgba(188,90,54,0.12)"/>
+          <line x1="420" y1="392" x2="700" y2="392" stroke="#BC5A36" stroke-width="1"/>
+          <text x="434" y="381" fill="#BC5A36" font-size="12" font-family="'Geist', sans-serif" font-weight="600">public.order_items</text>
+          <rect x="638" y="368" width="48" height="15" rx="2" fill="#BC5A36"/>
+          <text x="662" y="379" fill="#FAF8F5" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">CASCADE</text>
+
+          <!-- Row 0: id -->
+          <rect x="420" y="392" width="280" height="24" fill="#FFFFFF"/>
+          <text x="434" y="408" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif" font-weight="500">id</text>
+          <rect x="584" y="398" width="18" height="12" rx="2" fill="rgba(45,90,39,0.15)"/>
+          <text x="593" y="407" fill="#2D5A27" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">PK</text>
+          <text x="686" y="408" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">uuid</text>
+
+          <!-- Row 1: order_id (FK) -->
+          <rect x="420" y="416" width="280" height="24" fill="rgba(188,90,54,0.06)"/>
+          <text x="434" y="432" fill="#BC5A36" font-size="11" font-family="'Geist', sans-serif" font-weight="600">order_id</text>
+          <rect x="584" y="422" width="18" height="12" rx="2" fill="#BC5A36"/>
+          <text x="593" y="431" fill="#FAF8F5" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">FK</text>
+          <text x="686" y="432" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">uuid</text>
+
+          <!-- Row 2: product_id (FK) -->
+          <rect x="420" y="440" width="280" height="24" fill="#FFFFFF"/>
+          <text x="434" y="456" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">product_id</text>
+          <rect x="584" y="446" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="593" y="455" fill="#6B5E55" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">FK</text>
+          <text x="686" y="456" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">uuid</text>
+
+          <!-- Row 3: variant_id (FK) -->
+          <rect x="420" y="464" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="434" y="480" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">variant_id</text>
+          <rect x="584" y="470" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="593" y="479" fill="#6B5E55" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">FK</text>
+          <text x="686" y="480" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">uuid</text>
+
+          <!-- Row 4: quantity -->
+          <rect x="420" y="488" width="280" height="24" fill="#FFFFFF"/>
+          <text x="434" y="504" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">quantity</text>
+          <rect x="588" y="494" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="597" y="503" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="686" y="504" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">integer</text>
+
+          <!-- Row 5: unit_price -->
+          <rect x="420" y="512" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="434" y="528" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">unit_price</text>
+          <rect x="588" y="518" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="597" y="527" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="686" y="528" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">numeric(10,2)</text>
+        </g>
+
+
+        <!-- ================= TABLE 4: public.products ================= -->
+        <g id="table-products">
+          <rect x="800" y="80" width="280" height="224" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+          <!-- Header -->
+          <rect x="800" y="80" width="280" height="32" rx="6" fill="#F4F1EA"/>
+          <line x1="800" y1="112" x2="1080" y2="112" stroke="#D9D3C7" stroke-width="1"/>
+          <text x="814" y="101" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">public.products</text>
+          <rect x="1024" y="88" width="42" height="15" rx="2" fill="#D0DEC6"/>
+          <text x="1045" y="99" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">TABLE</text>
+
+          <!-- Row 0: id -->
+          <rect x="800" y="112" width="280" height="24" fill="#FFFFFF"/>
+          <text x="814" y="128" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif" font-weight="500">id</text>
+          <rect x="964" y="118" width="18" height="12" rx="2" fill="rgba(45,90,39,0.15)"/>
+          <text x="973" y="127" fill="#2D5A27" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">PK</text>
+          <text x="1066" y="128" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">uuid</text>
+
+          <!-- Row 1: sku -->
+          <rect x="800" y="136" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="814" y="152" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">sku</text>
+          <rect x="960" y="142" width="32" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="976" y="151" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">UQ NN</text>
+          <text x="1066" y="152" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(50)</text>
+
+          <!-- Row 2: name -->
+          <rect x="800" y="160" width="280" height="24" fill="#FFFFFF"/>
+          <text x="814" y="176" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">name</text>
+          <rect x="968" y="166" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="977" y="175" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="1066" y="176" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(120)</text>
+
+          <!-- Row 3: category -->
+          <rect x="800" y="184" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="814" y="200" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">category</text>
+          <rect x="968" y="190" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="977" y="199" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="1066" y="200" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(40)</text>
+
+          <!-- Row 4: base_price -->
+          <rect x="800" y="208" width="280" height="24" fill="#FFFFFF"/>
+          <text x="814" y="224" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">base_price</text>
+          <rect x="968" y="214" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="977" y="223" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="1066" y="224" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">numeric(10,2)</text>
+
+          <!-- Row 5: color_season -->
+          <rect x="800" y="232" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="814" y="248" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">color_season</text>
+          <text x="1066" y="248" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(30)</text>
+
+          <!-- Row 6: total_stock -->
+          <rect x="800" y="256" width="280" height="24" fill="#FFFFFF"/>
+          <text x="814" y="272" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">total_stock</text>
+          <rect x="968" y="262" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="977" y="271" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="1066" y="272" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">integer</text>
+
+          <!-- Row 7: in_stock -->
+          <rect x="800" y="280" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="814" y="296" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">in_stock</text>
+          <rect x="968" y="286" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="977" y="295" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="1066" y="296" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">boolean</text>
+        </g>
+
+
+        <!-- ================= TABLE 5: public.variants ================= -->
+        <g id="table-variants">
+          <rect x="800" y="360" width="280" height="200" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+          <!-- Header -->
+          <rect x="800" y="360" width="280" height="32" rx="6" fill="#F4F1EA"/>
+          <line x1="800" y1="392" x2="1080" y2="392" stroke="#D9D3C7" stroke-width="1"/>
+          <text x="814" y="381" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">public.variants</text>
+          <rect x="1024" y="368" width="42" height="15" rx="2" fill="#D0DEC6"/>
+          <text x="1045" y="379" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">TABLE</text>
+
+          <!-- Row 0: id -->
+          <rect x="800" y="392" width="280" height="24" fill="#FFFFFF"/>
+          <text x="814" y="408" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif" font-weight="500">id</text>
+          <rect x="964" y="398" width="18" height="12" rx="2" fill="rgba(45,90,39,0.15)"/>
+          <text x="973" y="407" fill="#2D5A27" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">PK</text>
+          <text x="1066" y="408" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">uuid</text>
+
+          <!-- Row 1: product_id (FK) -->
+          <rect x="800" y="416" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="814" y="432" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">product_id</text>
+          <rect x="964" y="422" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="973" y="431" fill="#6B5E55" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">FK</text>
+          <text x="1066" y="432" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">uuid</text>
+
+          <!-- Row 2: color_name -->
+          <rect x="800" y="440" width="280" height="24" fill="#FFFFFF"/>
+          <text x="814" y="456" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">color_name</text>
+          <rect x="968" y="446" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="977" y="455" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="1066" y="456" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(50)</text>
+
+          <!-- Row 3: color_hex -->
+          <rect x="800" y="464" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="814" y="480" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">color_hex</text>
+          <rect x="968" y="470" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="977" y="479" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="1066" y="480" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(7)</text>
+
+          <!-- Row 4: color_tone -->
+          <rect x="800" y="488" width="280" height="24" fill="#FFFFFF"/>
+          <text x="814" y="504" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">color_tone</text>
+          <text x="1066" y="504" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(20)</text>
+
+          <!-- Row 5: size -->
+          <rect x="800" y="512" width="280" height="24" fill="rgba(45,35,30,0.02)"/>
+          <text x="814" y="528" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">size</text>
+          <rect x="968" y="518" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="977" y="527" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="1066" y="528" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">varchar(10)</text>
+
+          <!-- Row 6: stock_quantity -->
+          <rect x="800" y="536" width="280" height="24" fill="#FFFFFF"/>
+          <text x="814" y="552" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">stock_quantity</text>
+          <rect x="968" y="542" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+          <text x="977" y="551" fill="#6B5E55" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle">NN</text>
+          <text x="1066" y="552" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">integer</text>
+        </g>
+
+
+        <!-- ================= LEGEND STRIP (BOTTOM 60PX) ================= -->
+        <line x1="50" y1="580" x2="1080" y2="580" stroke="#D9D3C7" stroke-width="0.8"/>
+        
+        <rect x="50" y="596" width="18" height="12" rx="2" fill="rgba(45,90,39,0.15)"/>
+        <text x="59" y="605" fill="#2D5A27" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">PK</text>
+        <text x="74" y="606" fill="#2D231E" font-size="9" font-family="'Geist Mono', monospace">Primary Key</text>
+
+        <rect x="180" y="596" width="18" height="12" rx="2" fill="rgba(107,94,85,0.15)"/>
+        <text x="189" y="605" fill="#6B5E55" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">FK</text>
+        <text x="204" y="606" fill="#2D231E" font-size="9" font-family="'Geist Mono', monospace">Foreign Key</text>
+
+        <line x1="320" y1="602" x2="350" y2="602" stroke="#BC5A36" stroke-width="1.6" marker-end="url(#arrow-cascade)"/>
+        <text x="358" y="606" fill="#BC5A36" font-size="9" font-family="'Geist Mono', monospace" font-weight="600">ON DELETE CASCADE (Focal)</text>
+
+        <line x1="580" y1="602" x2="610" y2="602" stroke="#6B5E55" stroke-width="1.3" marker-end="url(#arrow-erd)"/>
+        <text x="618" y="606" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">ON DELETE RESTRICT</text>
+
+        <text x="960" y="606" fill="#8C7E74" font-size="9" font-family="'Geist Mono', monospace">PostgreSQL / Relational DDL</text>
+      </svg>
+    </div>
+
+    <!-- Editorial Summary Cards -->
+    <div class="cards">
+      <div class="card">
+        <div class="eyebrow">Inventory Architecture</div>
+        <div class="card-header">
+          <div class="card-dot accent"></div>
+          <h3>Products &amp; Color Variants</h3>
+        </div>
+        <p>1-to-N normalized decomposition between high-level garments and specific SKU colorways. Supports live hex codes, seasonal tags (Spring/Autumn Warm, Summer/Winter Cool), and stock counts.</p>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Referential Integrity</div>
+        <div class="card-header">
+          <div class="card-dot highlight"></div>
+          <h3>Orders &amp; Line Items</h3>
+        </div>
+        <p>Enforces strict relational constraints. Line items carry a cascade delete from their parent order while maintaining restrict constraints against deleted master catalog rows.</p>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Customer Security</div>
+        <div class="card-header">
+          <div class="card-dot muted"></div>
+          <h3>Membership &amp; VIP State</h3>
+        </div>
+        <p>The users table holds hashed credentials, system roles (Member vs Admin), and persistent customer Personal Color diagnosis for personalized catalog recommendations.</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>MatchA Schema DDL v1.0</span>
+      <span>Designed with diagram-design · Brand Skin: MatchA Studio</span>
+    </div>
+  </div>
+</body>
+</html>

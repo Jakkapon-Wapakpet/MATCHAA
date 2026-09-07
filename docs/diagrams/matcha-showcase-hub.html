@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MatchA · Diagram Design Showcase Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #FAF8F5;
+      --color-paper-2: #F4F1EA;
+      --color-ink: #2D231E;
+      --color-muted: #6B5E55;
+      --color-soft: #8C7E74;
+      --color-rule: rgba(45,35,30,0.12);
+      --color-rule-solid: #D9D3C7;
+      --color-accent: #2D5A27;
+      --color-accent-dark: #23471E;
+      --color-accent-tint: rgba(45,90,39,0.08);
+      --color-highlight: #BC5A36;
+      --color-secondary: #D0DEC6;
+      --font-sans: 'Geist', system-ui, sans-serif;
+      --font-serif: 'Instrument Serif', serif;
+      --font-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      color: var(--color-ink);
+    }
+    .hub-container { max-width: 1240px; margin: 0 auto; }
+    
+    /* Top Banner */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--color-rule);
+      margin-bottom: 2rem;
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      background: var(--color-accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FAF8F5;
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .brand-text h2 {
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+    }
+    .brand-text p {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+    }
+    .palette-strip {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--color-paper-2);
+      padding: 0.35rem 0.65rem;
+      border-radius: 20px;
+      border: 1px solid var(--color-rule-solid);
+    }
+    .palette-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .swatch-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--color-muted);
+      margin-left: 0.25rem;
+    }
+
+    /* Hero */
+    .hero { margin-bottom: 2rem; }
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(2.25rem, 4vw + 1rem, 3.25rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      margin-bottom: 0.75rem;
+    }
+    .hero-desc {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--color-muted);
+      max-width: 72ch;
+    }
+
+    /* Grid stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2.25rem;
+    }
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .stats-grid { grid-template-columns: 1fr; } }
+    .stat-card {
+      background: #FFFFFF;
+      border: 1px solid var(--color-rule-solid);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+    .stat-num {
+      font-family: var(--font-serif);
+      font-size: 1.75rem;
+      color: var(--color-accent);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    .stat-label {
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--color-ink);
+      margin-bottom: 0.2rem;
+    }
+    .stat-sub {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--color-soft);
+    }
+
+    /* Interactive Tab Switcher (Pure CSS) */
+    .tab-system { margin-bottom: 2.5rem; }
+    .tab-inputs { display: none; }
+    
+    .tab-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid var(--color-rule-solid);
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .tab-label {
+      padding: 0.75rem 1.25rem;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--color-muted);
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tab-label:hover {
+      color: var(--color-ink);
+      background: rgba(45,35,30,0.03);
+    }
+    .tab-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--color-paper-2);
+      color: var(--color-muted);
+    }
+
+    /* Tab active states */
+    #tab1-radio:checked ~ .tab-nav label[for="tab1-radio"],
+    #tab2-radio:checked ~ .tab-nav label[for="tab2-radio"],
+    #tab3-radio:checked ~ .tab-nav label[for="tab3-radio"] {
+      color: var(--color-accent);
+      font-weight: 600;
+      border-bottom: 2px solid var(--color-accent);
+      margin-bottom: -2px;
+      background: rgba(45,90,39,0.06);
+    }
+    #tab1-radio:checked ~ .tab-nav label[for="tab1-radio"] .tab-badge,
+    #tab2-radio:checked ~ .tab-nav label[for="tab2-radio"] .tab-badge,
+    #tab3-radio:checked ~ .tab-nav label[for="tab3-radio"] .tab-badge {
+      background: var(--color-accent);
+      color: #FAF8F5;
+    }
+
+    .tab-pane { display: none; }
+    #tab1-radio:checked ~ .tab-content #tab1-pane,
+    #tab2-radio:checked ~ .tab-content #tab2-pane,
+    #tab3-radio:checked ~ .tab-content #tab3-pane {
+      display: block;
+    }
+
+    /* Diagram Card Frame */
+    .showcase-frame {
+      background: var(--color-paper-2);
+      border-radius: 12px;
+      border: 1px solid var(--color-rule-solid);
+      padding: 1.5rem;
+      box-shadow: 0 6px 24px -4px rgba(45,35,30,0.06);
+    }
+    .frame-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--color-rule);
+    }
+    .frame-meta h3 {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 400;
+      color: var(--color-ink);
+    }
+    .frame-meta p {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-muted);
+    }
+    .frame-links {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .btn-link {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-accent);
+      text-decoration: none;
+      padding: 0.4rem 0.8rem;
+      background: #FFFFFF;
+      border: 1px solid var(--color-rule-solid);
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .btn-link:hover {
+      background: var(--color-accent);
+      color: #FFFFFF;
+      border-color: var(--color-accent);
+    }
+
+    .svg-scroll-box {
+      background: #FFFFFF;
+      border-radius: 8px;
+      border: 1px solid var(--color-rule-solid);
+      overflow-x: auto;
+      padding: 1rem;
+    }
+    .svg-scroll-box svg {
+      width: 100%;
+      min-width: 980px;
+      display: block;
+    }
+
+    /* File index directory */
+    .file-index {
+      margin-top: 3rem;
+      background: #FFFFFF;
+      border: 1px solid var(--color-rule-solid);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+    }
+    .file-index h3 {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      margin-bottom: 0.5rem;
+    }
+    .file-index p {
+      font-size: 0.875rem;
+      color: var(--color-muted);
+      margin-bottom: 1.25rem;
+    }
+    .file-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 860px) { .file-list { grid-template-columns: 1fr; } }
+    .file-card {
+      border: 1px solid var(--color-rule-solid);
+      border-radius: 8px;
+      padding: 1rem;
+      background: var(--color-paper);
+    }
+    .file-type {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 0.35rem;
+    }
+    .file-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .file-desc {
+      font-size: 0.8rem;
+      color: var(--color-muted);
+      line-height: 1.5;
+      margin-bottom: 0.85rem;
+    }
+    .file-card a {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+    .file-card a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--color-rule);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      color: var(--color-soft);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="hub-container">
+    <!-- Top Navigation Bar -->
+    <div class="top-bar">
+      <div class="brand-group">
+        <div class="brand-mark">M</div>
+        <div class="brand-text">
+          <h2>MatchA Architecture Suite</h2>
+          <p>Personal Color Fashion &amp; Accessories</p>
+        </div>
+      </div>
+      <div class="palette-strip">
+        <div class="palette-swatch" style="background:#FAF8F5;" title="Warm Cream (#FAF8F5)"></div>
+        <div class="palette-swatch" style="background:#2D5A27;" title="Deep Matcha (#2D5A27)"></div>
+        <div class="palette-swatch" style="background:#D0DEC6;" title="Soft Sage (#D0DEC6)"></div>
+        <div class="palette-swatch" style="background:#BC5A36;" title="Terracotta Rust (#BC5A36)"></div>
+        <div class="palette-swatch" style="background:#2D231E;" title="Espresso Brown (#2D231E)"></div>
+        <span class="swatch-label">Brand Tokens</span>
+      </div>
+    </div>
+
+    <!-- Hero Header -->
+    <div class="hero">
+      <p class="hero-eyebrow">Diagram Design Suite · Deliverables</p>
+      <h1>MatchA Engineering Diagrams</h1>
+      <p class="hero-desc">Complete architectural blueprint for MatchA personal color fashion e-commerce platform. Rendered with editorial SVG precision using custom MatchA studio design tokens.</p>
+    </div>
+
+    <!-- Stats KPI Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num">3-Tier</div>
+        <div class="stat-label">Fullstack Architecture</div>
+        <div class="stat-sub">Vite React 19 + Express + DB</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">5 Tables</div>
+        <div class="stat-label">Normalized Data ERD</div>
+        <div class="stat-sub">Cascade &amp; Restrict FK constraints</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">4 Seasons</div>
+        <div class="stat-label">Personal Color Filter</div>
+        <div class="stat-sub">Spring, Summer, Autumn, Winter</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">15% Cut</div>
+        <div class="stat-label">VIP Auto-Discount</div>
+        <div class="stat-sub">Dynamic Connoisseur ALT Branch</div>
+      </div>
+    </div>
+
+    <!-- Pure CSS Interactive Tabs -->
+    <div class="tab-system">
+      <input type="radio" id="tab1-radio" name="showcase-tab" class="tab-inputs" checked>
+      <input type="radio" id="tab2-radio" name="showcase-tab" class="tab-inputs">
+      <input type="radio" id="tab3-radio" name="showcase-tab" class="tab-inputs">
+
+      <div class="tab-nav">
+        <label for="tab1-radio" class="tab-label">
+          <span>1. System Architecture</span>
+          <span class="tab-badge">C4 / Container</span>
+        </label>
+        <label for="tab2-radio" class="tab-label">
+          <span>2. Database Schema (ERD)</span>
+          <span class="tab-badge">DDL / Relational</span>
+        </label>
+        <label for="tab3-radio" class="tab-label">
+          <span>3. Order &amp; Customization Sequence</span>
+          <span class="tab-badge">Flow / Protocol</span>
+        </label>
+      </div>
+
+      <div class="tab-content">
+        <!-- Tab 1: Architecture -->
+        <div id="tab1-pane" class="tab-pane">
+          <div class="showcase-frame">
+            <div class="frame-toolbar">
+              <div class="frame-meta">
+                <h3>System Architecture &amp; Service Boundaries</h3>
+                <p>Format: Standalone SVG Canvas (1040 x 540) · Client SPA to Application Gateway and Data Persistence</p>
+              </div>
+              <div class="frame-links">
+                <a href="matcha-architecture.html" class="btn-link" target="_blank">Open Standalone File &rarr;</a>
+              </div>
+            </div>
+            <div class="svg-scroll-box">
+              <svg viewBox="0 0 1040 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="hub-arch-title hub-arch-desc">
+                <title id="hub-arch-title">MatchA System Architecture Overview</title>
+                <desc id="hub-arch-desc">Embedded overview of MatchA fullstack architecture showing client tier, express gateway, and data persistence.</desc>
+                <defs>
+                  <pattern id="hub-dots1" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1" fill="rgba(45,35,30,0.06)"/>
+                  </pattern>
+                  <marker id="hub-arrow-d" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6B5E55"/></marker>
+                  <marker id="hub-arrow-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2D5A27"/></marker>
+                  <marker id="hub-arrow-h" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#BC5A36"/></marker>
+                </defs>
+                <rect width="100%" height="100%" fill="#FAF8F5"/>
+                <rect width="100%" height="100%" fill="url(#hub-dots1)"/>
+                <!-- Zones -->
+                <rect x="40" y="56" width="230" height="390" rx="10" fill="#F4F1EA" stroke="#D9D3C7" stroke-width="1"/>
+                <rect x="56" y="48" width="130" height="18" rx="3" fill="#FAF8F5" stroke="#D9D3C7" stroke-width="0.8"/>
+                <text x="121" y="60" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">1. CLIENT LAYER</text>
+
+                <rect x="340" y="56" width="370" height="390" rx="10" fill="#F4F1EA" stroke="#D9D3C7" stroke-width="1"/>
+                <rect x="356" y="48" width="170" height="18" rx="3" fill="#FAF8F5" stroke="#D9D3C7" stroke-width="0.8"/>
+                <text x="441" y="60" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">2. APPLICATION GATEWAY</text>
+
+                <rect x="780" y="56" width="220" height="390" rx="10" fill="#F4F1EA" stroke="#D9D3C7" stroke-width="1"/>
+                <rect x="796" y="48" width="130" height="18" rx="3" fill="#FAF8F5" stroke="#D9D3C7" stroke-width="0.8"/>
+                <text x="861" y="60" fill="#2D5A27" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">3. DATA &amp; STORAGE</text>
+
+                <!-- Connectors -->
+                <line x1="240" y1="128" x2="368" y2="128" stroke="#2D5A27" stroke-width="1.5" marker-end="url(#hub-arrow-a)"/>
+                <line x1="368" y1="148" x2="240" y2="148" stroke="#6B5E55" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#hub-arrow-d)"/>
+                <path d="M 520,158 V 200" fill="none" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#hub-arrow-d)"/>
+                <path d="M 440,158 V 290 Q 440,298 448,298 H 472" fill="none" stroke="#BC5A36" stroke-width="1.4" marker-end="url(#hub-arrow-h)"/>
+                <path d="M 400,158 V 378 Q 400,386 408,386 H 472" fill="none" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#hub-arrow-d)"/>
+                <path d="M 680,228 H 740 Q 748,228 748,208 V 140 Q 748,132 756,132 H 808" fill="none" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#hub-arrow-d)"/>
+                <path d="M 680,314 H 748 Q 756,314 756,290 V 238 Q 756,230 764,230 H 808" fill="none" stroke="#BC5A36" stroke-width="1.4" marker-end="url(#hub-arrow-h)"/>
+                <path d="M 680,396 H 756 Q 764,396 764,340 Q 764,330 772,330 H 808" fill="none" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#hub-arrow-d)"/>
+
+                <!-- Client Nodes -->
+                <rect x="64" y="96" width="176" height="64" rx="6" fill="#FFFFFF" stroke="#2D5A27" stroke-width="1.5"/>
+                <text x="72" y="132" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">MatchA Web App</text>
+                <text x="72" y="148" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">React 19 · Vite · Tailwind</text>
+
+                <rect x="64" y="190" width="176" height="56" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <text x="72" y="212" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Color Customizer</text>
+                <text x="72" y="228" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Swatches · Mix&amp;Match UI</text>
+
+                <rect x="64" y="274" width="176" height="56" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <text x="72" y="296" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Cart &amp; Member Hub</text>
+                <text x="72" y="312" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">VIP Tier · PromptPay QR</text>
+
+                <rect x="64" y="358" width="176" height="56" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <text x="72" y="380" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Admin Dashboard</text>
+                <text x="72" y="396" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Inventory &amp; Analytics</text>
+
+                <!-- Gateway Nodes -->
+                <rect x="368" y="96" width="312" height="62" rx="6" fill="rgba(45,90,39,0.08)" stroke="#2D5A27" stroke-width="2"/>
+                <text x="378" y="132" fill="#2D231E" font-size="13" font-family="'Geist', sans-serif" font-weight="600">Express.js API Gateway (:5000)</text>
+                <text x="378" y="148" fill="#2D5A27" font-size="9" font-family="'Geist Mono', monospace">JWT Auth · CORS · Request Logger</text>
+
+                <rect x="472" y="200" width="208" height="58" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <text x="484" y="222" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Personal Color Engine</text>
+                <text x="484" y="238" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Spring/Summer/Autumn/Winter</text>
+
+                <rect x="472" y="284" width="208" height="60" rx="6" fill="#FFFFFF" stroke="#BC5A36" stroke-width="1.5"/>
+                <text x="484" y="321" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Order &amp; Payment Service</text>
+                <text x="484" y="335" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">PromptPay QR · VIP 15% Discount</text>
+
+                <rect x="472" y="368" width="208" height="58" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <text x="484" y="390" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Inventory &amp; Analytics API</text>
+                <text x="484" y="406" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">CRUD (+10/-5) · Revenue Reports</text>
+
+                <!-- Data Nodes -->
+                <rect x="808" y="104" width="168" height="58" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <text x="820" y="126" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Products Catalog</text>
+                <text x="820" y="142" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Garments &amp; Swatches DB</text>
+
+                <rect x="808" y="200" width="168" height="58" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <text x="820" y="222" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">Orders &amp; Users DB</text>
+                <text x="820" y="238" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Transactions &amp; Membership</text>
+
+                <rect x="808" y="296" width="168" height="58" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <text x="820" y="318" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">CDN &amp; Cloud Assets</text>
+                <text x="820" y="334" fill="#6B5E55" font-size="9" font-family="'Geist Mono', monospace">Lookbook Images &amp; Media</text>
+
+                <!-- Legend -->
+                <line x1="40" y1="480" x2="1000" y2="480" stroke="#D9D3C7" stroke-width="0.8"/>
+                <rect x="40" y="496" width="12" height="12" rx="2" fill="#2D5A27"/>
+                <text x="58" y="506" fill="#2D231E" font-size="9" font-family="'Geist Mono', monospace">Primary Brand Core</text>
+                <rect x="220" y="496" width="12" height="12" rx="2" fill="#BC5A36"/>
+                <text x="238" y="506" fill="#2D231E" font-size="9" font-family="'Geist Mono', monospace">Checkout / Critical Path</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Database Schema -->
+        <div id="tab2-pane" class="tab-pane">
+          <div class="showcase-frame">
+            <div class="frame-toolbar">
+              <div class="frame-meta">
+                <h3>Relational Database Schema &amp; Entity Relationships</h3>
+                <p>Format: Standalone SVG Canvas (1140 x 640) · Strict foreign key referential integrity with ON DELETE CASCADE actions</p>
+              </div>
+              <div class="frame-links">
+                <a href="matcha-database-erd.html" class="btn-link" target="_blank">Open Standalone File &rarr;</a>
+              </div>
+            </div>
+            <div class="svg-scroll-box">
+              <svg viewBox="0 0 1140 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="hub-erd-title hub-erd-desc">
+                <title id="hub-erd-title">MatchA Database Schema Overview</title>
+                <desc id="hub-erd-desc">Embedded overview of MatchA relational schema showing users, orders, order items, products, and variants.</desc>
+                <defs>
+                  <pattern id="hub-dots2" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1" fill="rgba(45,35,30,0.06)"/>
+                  </pattern>
+                  <marker id="hub-erd-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6B5E55"/></marker>
+                  <marker id="hub-erd-cascade" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#BC5A36"/></marker>
+                </defs>
+                <rect width="100%" height="100%" fill="#FAF8F5"/>
+                <rect width="100%" height="100%" fill="url(#hub-dots2)"/>
+
+                <!-- FK Lines -->
+                <path d="M 420,148 H 365 Q 357,148 357,140 V 132 Q 357,124 349,124 H 310" fill="none" stroke="#6B5E55" stroke-width="1.3" marker-end="url(#hub-erd-arrow)"/>
+                <path d="M 420,428 H 380 Q 372,428 372,420 V 132 Q 372,124 380,124 H 420" fill="none" stroke="#BC5A36" stroke-width="1.6" marker-end="url(#hub-erd-cascade)"/>
+                <path d="M 700,452 H 742 Q 750,452 750,444 V 132 Q 750,124 758,124 H 800" fill="none" stroke="#6B5E55" stroke-width="1.3" marker-end="url(#hub-erd-arrow)"/>
+                <path d="M 800,428 H 776 Q 768,428 768,420 V 152 Q 768,144 776,144 H 800" fill="none" stroke="#6B5E55" stroke-width="1.3" marker-end="url(#hub-erd-arrow)"/>
+                <path d="M 700,476 H 732 Q 740,476 740,468 V 412 Q 740,404 748,404 H 800" fill="none" stroke="#6B5E55" stroke-width="1.3" marker-end="url(#hub-erd-arrow)"/>
+
+                <!-- Table users -->
+                <rect x="50" y="80" width="260" height="200" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <rect x="50" y="80" width="260" height="32" rx="6" fill="#F4F1EA"/>
+                <text x="64" y="101" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">public.users</text>
+                <text x="64" y="128" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">id [PK]</text>
+                <text x="64" y="152" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">email [UQ, NN]</text>
+                <text x="64" y="176" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">password_hash</text>
+                <text x="64" y="200" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">role</text>
+                <text x="64" y="224" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">personal_color</text>
+                <text x="64" y="248" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">is_vip</text>
+                <text x="64" y="272" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">created_at</text>
+
+                <!-- Table orders -->
+                <rect x="420" y="80" width="280" height="224" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <rect x="420" y="80" width="280" height="32" rx="6" fill="#F4F1EA"/>
+                <text x="434" y="101" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">public.orders</text>
+                <text x="434" y="128" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">id [PK]</text>
+                <text x="434" y="152" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">user_id [FK]</text>
+                <text x="434" y="176" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">order_number</text>
+                <text x="434" y="200" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">subtotal</text>
+                <text x="434" y="224" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">discount</text>
+                <text x="434" y="248" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">total_amount</text>
+                <text x="434" y="272" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">order_status</text>
+                <text x="434" y="296" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">purchase_date</text>
+
+                <!-- Table order_items -->
+                <rect x="420" y="360" width="280" height="176" rx="6" fill="#FFFFFF" stroke="#BC5A36" stroke-width="1.5"/>
+                <rect x="420" y="360" width="280" height="32" rx="6" fill="rgba(188,90,54,0.12)"/>
+                <text x="434" y="381" fill="#BC5A36" font-size="12" font-family="'Geist', sans-serif" font-weight="600">public.order_items</text>
+                <text x="434" y="408" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">id [PK]</text>
+                <text x="434" y="432" fill="#BC5A36" font-size="11" font-family="'Geist', sans-serif">order_id [FK - CASCADE]</text>
+                <text x="434" y="456" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">product_id [FK]</text>
+                <text x="434" y="480" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">variant_id [FK]</text>
+                <text x="434" y="504" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">quantity</text>
+                <text x="434" y="528" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">unit_price</text>
+
+                <!-- Table products -->
+                <rect x="800" y="80" width="280" height="224" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <rect x="800" y="80" width="280" height="32" rx="6" fill="#F4F1EA"/>
+                <text x="814" y="101" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">public.products</text>
+                <text x="814" y="128" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">id [PK]</text>
+                <text x="814" y="152" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">sku</text>
+                <text x="814" y="176" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">name</text>
+                <text x="814" y="200" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">category</text>
+                <text x="814" y="224" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">base_price</text>
+                <text x="814" y="248" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">color_season</text>
+                <text x="814" y="272" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">total_stock</text>
+                <text x="814" y="296" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">in_stock</text>
+
+                <!-- Table variants -->
+                <rect x="800" y="360" width="280" height="200" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <rect x="800" y="360" width="280" height="32" rx="6" fill="#F4F1EA"/>
+                <text x="814" y="381" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600">public.variants</text>
+                <text x="814" y="408" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">id [PK]</text>
+                <text x="814" y="432" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">product_id [FK]</text>
+                <text x="814" y="456" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">color_name</text>
+                <text x="814" y="480" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">color_hex</text>
+                <text x="814" y="504" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">color_tone</text>
+                <text x="814" y="528" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">size</text>
+                <text x="814" y="552" fill="#2D231E" font-size="11" font-family="'Geist', sans-serif">stock_quantity</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Sequence -->
+        <div id="tab3-pane" class="tab-pane">
+          <div class="showcase-frame">
+            <div class="frame-toolbar">
+              <div class="frame-meta">
+                <h3>Order Lifecycle &amp; Personal Color Customization Flow</h3>
+                <p>Format: Standalone SVG Canvas (1080 x 700) · Synchronous and asynchronous protocol exchanges with VIP Branching</p>
+              </div>
+              <div class="frame-links">
+                <a href="matcha-order-sequence.html" class="btn-link" target="_blank">Open Standalone File &rarr;</a>
+              </div>
+            </div>
+            <div class="svg-scroll-box">
+              <svg viewBox="0 0 1080 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="hub-seq-title hub-seq-desc">
+                <title id="hub-seq-title">MatchA Order Flow Overview</title>
+                <desc id="hub-seq-desc">Embedded overview of MatchA order sequence protocol with customer, client app, gateway, and payment processor.</desc>
+                <defs>
+                  <pattern id="hub-dots3" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1" fill="rgba(45,35,30,0.06)"/>
+                  </pattern>
+                  <marker id="hub-s-sync" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6B5E55"/></marker>
+                  <marker id="hub-s-ret" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6B5E55"/></marker>
+                  <marker id="hub-s-succ" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2D5A27"/></marker>
+                </defs>
+                <rect width="100%" height="100%" fill="#FAF8F5"/>
+                <rect width="100%" height="100%" fill="url(#hub-dots3)"/>
+                <!-- Lifelines -->
+                <line x1="130" y1="84" x2="130" y2="620" stroke="#D9D3C7" stroke-width="1.2" stroke-dasharray="4,4"/>
+                <line x1="340" y1="84" x2="340" y2="620" stroke="#D9D3C7" stroke-width="1.2" stroke-dasharray="4,4"/>
+                <line x1="560" y1="84" x2="560" y2="620" stroke="#D9D3C7" stroke-width="1.2" stroke-dasharray="4,4"/>
+                <line x1="780" y1="84" x2="780" y2="620" stroke="#D9D3C7" stroke-width="1.2" stroke-dasharray="4,4"/>
+                <line x1="970" y1="84" x2="970" y2="620" stroke="#D9D3C7" stroke-width="1.2" stroke-dasharray="4,4"/>
+
+                <!-- ALT Region -->
+                <rect x="320" y="270" width="480" height="120" rx="4" fill="rgba(45,35,30,0.02)" stroke="rgba(45,35,30,0.18)" stroke-width="1"/>
+                <text x="339" y="281" fill="#6B5E55" font-size="7.5" font-family="'Geist Mono', monospace" font-weight="600">ALT: VIP vs Standard Discount</text>
+
+                <!-- Messages -->
+                <line x1="134" y1="120" x2="336" y2="120" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#hub-s-sync)"/>
+                <text x="235" y="112" fill="#2D231E" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">1. Swatch Selection (Sage Green / L)</text>
+                
+                <line x1="134" y1="174" x2="336" y2="174" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#hub-s-sync)"/>
+                <text x="235" y="168" fill="#2D231E" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">2. Proceed Checkout</text>
+
+                <line x1="344" y1="184" x2="556" y2="184" stroke="#6B5E55" stroke-width="1.2" marker-end="url(#hub-s-sync)"/>
+                <text x="450" y="178" fill="#2D231E" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">3. POST /api/checkout/quote</text>
+
+                <line x1="564" y1="416" x2="966" y2="416" stroke="#BC5A36" stroke-width="1.4" marker-end="url(#hub-s-sync)"/>
+                <text x="765" y="408" fill="#BC5A36" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">4. Generate PromptPay QR Payload</text>
+
+                <line x1="556" y1="574" x2="344" y2="574" stroke="#2D5A27" stroke-width="1.8" marker-end="url(#hub-s-succ)"/>
+                <text x="450" y="566" fill="#2D5A27" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="600" text-anchor="middle">5. Order Confirmed: #MTA-88219 (Success)</text>
+
+                <!-- Headers -->
+                <rect x="40" y="32" width="180" height="48" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <text x="130" y="60" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600" text-anchor="middle">Customer</text>
+
+                <rect x="250" y="32" width="180" height="48" rx="6" fill="#FFFFFF" stroke="#2D5A27" stroke-width="1.4"/>
+                <text x="340" y="60" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600" text-anchor="middle">MatchA Web App</text>
+
+                <rect x="470" y="32" width="180" height="48" rx="6" fill="rgba(45,90,39,0.08)" stroke="#2D5A27" stroke-width="1.8"/>
+                <text x="560" y="60" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600" text-anchor="middle">Express Gateway</text>
+
+                <rect x="690" y="32" width="180" height="48" rx="6" fill="#FFFFFF" stroke="#D9D3C7" stroke-width="1"/>
+                <text x="780" y="60" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600" text-anchor="middle">Catalog &amp; Stock</text>
+
+                <rect x="880" y="32" width="180" height="48" rx="6" fill="#FFFFFF" stroke="#BC5A36" stroke-width="1.4"/>
+                <text x="970" y="60" fill="#2D231E" font-size="12" font-family="'Geist', sans-serif" font-weight="600" text-anchor="middle">PromptPay QR</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Standalone Files Index Directory -->
+    <div class="file-index">
+      <h3>Deliverables Directory</h3>
+      <p>All diagrams are self-contained HTML files located in <code>docs/diagrams/</code> with zero external dependencies (aside from Google Fonts):</p>
+      
+      <div class="file-list">
+        <div class="file-card">
+          <div class="file-type">Architecture Diagram</div>
+          <div class="file-name">matcha-architecture.html</div>
+          <div class="file-desc">Frontend client layer, Node.js Express Gateway (:5000), Personal Color filtering engine, and persistence tiers.</div>
+          <a href="matcha-architecture.html" target="_blank">View Diagram File &rarr;</a>
+        </div>
+
+        <div class="file-card">
+          <div class="file-type">Database Schema</div>
+          <div class="file-name">matcha-database-erd.html</div>
+          <div class="file-desc">5 physical relational tables, column types, primary/foreign keys, and CASCADE constraints on order items.</div>
+          <a href="matcha-database-erd.html" target="_blank">View Diagram File &rarr;</a>
+        </div>
+
+        <div class="file-card">
+          <div class="file-type">Sequence Diagram</div>
+          <div class="file-name">matcha-order-sequence.html</div>
+          <div class="file-desc">Complete order protocol from color customizer and stock check to PromptPay settlement and order receipts.</div>
+          <a href="matcha-order-sequence.html" target="_blank">View Diagram File &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>MatchA Engineering Specifications Suite v1.0</span>
+      <span>Designed with diagram-design · Brand Skin: MatchA Studio</span>
+    </div>
+  </div>
+</body>
+</html>
