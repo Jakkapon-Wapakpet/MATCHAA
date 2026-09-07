@@ -8,7 +8,7 @@ import CatalogPage from './pages/CatalogPage';
 import CartPage from './pages/CartPage';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
-import Payment from './pages/Payment';
+import PaymentPage from './pages/PaymentPage';
 import UserAccount from './pages/UserAccount';
 import AdminPage from './pages/AdminPage';
 import PersonalColorPage from './pages/PersonalColorPage';
@@ -286,12 +286,7 @@ function AppContent() {
           {/* 4. Payment / Checkout Page */}
           <Route 
             path="/payment" 
-            element={
-              <Payment 
-                cartItems={cartItems}
-                onUpdateCart={setCartItems}
-              />
-            } 
+            element={<PaymentPage />} 
           />
 
           {/* 5. Login Page */}
