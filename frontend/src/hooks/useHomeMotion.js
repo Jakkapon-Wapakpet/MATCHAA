@@ -1,14 +1,15 @@
 import { useEffect, useRef } from 'react';
 
-// Animate only on first entry; content remains visible without observer support.
-export default function useHomeMotion(enabled, replay) {
+// Reveal each [data-home-reveal] target once, the first time it scrolls into
+// view. What the reveal looks like is left to styles/home-motion.css, which
+// swaps in a plain fade when the page is in reduced-motion mode.
+export default function useHomeMotion(replay = 0) {
   const rootRef = useRef(null);
   useEffect(() => {
     const root = rootRef.current;
     if (!root || !('IntersectionObserver' in window)) return;
     const targets = root.querySelectorAll('[data-home-reveal]');
     targets.forEach((element) => element.classList.remove('home-entered'));
-    if (!enabled) return;
     // Commit the reset so replay starts a fresh CSS animation.
     void root.offsetWidth;
     const observer = new IntersectionObserver((entries) => {
@@ -18,8 +19,8 @@ export default function useHomeMotion(enabled, replay) {
         observer.unobserve(target);
       });
     }, { threshold: 0.08 });
-    root.querySelectorAll('[data-home-reveal]').forEach((element) => observer.observe(element));
+    targets.forEach((element) => observer.observe(element));
     return () => observer.disconnect();
-  }, [enabled, replay]);
+  }, [replay]);
   return rootRef;
 }

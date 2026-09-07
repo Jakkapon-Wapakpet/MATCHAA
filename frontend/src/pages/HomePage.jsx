@@ -19,7 +19,7 @@ export default function HomePage({
   onSubscribe,
 }) {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const motionRef = useHomeMotion(!prefersReducedMotion, 0);
+  const motionRef = useHomeMotion();
   const handleScrollToFit = () => {
     const el = document.getElementById('fit-guide');
     if (el) el.scrollIntoView({ behavior: 'smooth' });

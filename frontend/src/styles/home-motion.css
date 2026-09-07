@@ -18,14 +18,30 @@
   from { clip-path: inset(5% 2%); }
   to { clip-path: inset(0); }
 }
-/* Reduced motion: switch off the motion that runs on its own — the masthead
-   reveal, the idle float loops and (in BrandHero) the scroll-driven scale.
-   Hover feedback, colour fades and the tilt stay; useHomeMotion separately
-   withholds .home-entered so the scroll reveals never start. */
-.home-page[data-motion="reduced"] .home-masthead-title { animation: none; }
+/* Reduced motion: reduce, don't remove. Anything that travels across the screen
+   is replaced by a plain opacity fade, so the page still reads as alive without
+   the movement that triggers motion sensitivity. Hover feedback and the tilt are
+   user-driven and stay as they are. */
+@keyframes home-fade-enter { from { opacity: 0.4; } to { opacity: 1; } }
+
+/* Masthead: swoop up from below -> fade in place. */
+.home-page[data-motion="reduced"] .home-masthead-title { animation-name: home-fade-enter; }
+
+/* Film panel: clip-path wipe -> fade. */
+.home-page[data-motion="reduced"] [data-home-reveal="film"].home-entered {
+  animation-name: home-fade-enter;
+}
+
+/* Fit cards: the endless float loop has no gentle equivalent, so it stops and
+   the cards fade in once as they arrive instead. The reveal is scoped to this
+   mode so it never competes with the float animation at full motion. */
 .home-page[data-motion="reduced"] .animate-card-float-1,
 .home-page[data-motion="reduced"] .animate-card-float-2,
 .home-page[data-motion="reduced"] .animate-card-float-3 { animation: none; }
+.home-page[data-motion="reduced"] [data-home-reveal="card"].home-entered {
+  animation: home-fade-enter 500ms ease-out backwards;
+  animation-delay: var(--home-delay, 0ms);
+}
 @media (hover: none) {
   .home-page .preserve-3d { transform: none !important; }
 }
